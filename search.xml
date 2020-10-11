@@ -495,8 +495,11 @@
   <entry>
     <title>SpringCloud笔记：统一配置中心</title>
     <url>/2018/12/04/Spring-Cloud-Config/</url>
-    <content><![CDATA[<p>对于配置的重要性，我想我不用进行任何强调，大家都可以明白其重要性。在普通单体应用，我们常使用配置文件(application(*).properties(yml))管理应用的所有配置。这些配置文件在单体应用中非常胜任其角色，并没有让我们感觉到有头疼的地方。但随着微服务框架的引入，微服务数量就会在我们产品中不断增加，之前我们重点考虑的是系统的可伸缩、可扩展性好，但随之就是配置管理的问题就会一一暴露出来。起初微服务器各自管各自的配置，在开发阶段并没什么问题，但到了生产环境管理就会很头疼，如果要大规模更新某项配置，困难就可想而知。<br>为此，在分布式系统中，Spring Cloud提供一个Config子项目，该项目核心就是配置中心，通过一个服务端和多个客户端实现配置服务。我们可使用配置服务器集中的管理所有服务的各种环境配置文件。配置服务中心默认采用Git的方式进行存储，因此我们很容易部署修改，并可以对环境配置进行版本管理。</p>
+    <content><![CDATA[<p>SpringCloud笔记：统一配置中心入门。</p>
 <a id="more"></a>
+
+
+<p>对于配置的重要性，我想我不用进行任何强调，大家都可以明白其重要性。在普通单体应用，我们常使用配置文件(application(*).properties(yml))管理应用的所有配置。这些配置文件在单体应用中非常胜任其角色，并没有让我们感觉到有头疼的地方。但随着微服务框架的引入，微服务数量就会在我们产品中不断增加，之前我们重点考虑的是系统的可伸缩、可扩展性好，但随之就是配置管理的问题就会一一暴露出来。起初微服务器各自管各自的配置，在开发阶段并没什么问题，但到了生产环境管理就会很头疼，如果要大规模更新某项配置，困难就可想而知。<br>为此，在分布式系统中，Spring Cloud提供一个Config子项目，该项目核心就是配置中心，通过一个服务端和多个客户端实现配置服务。我们可使用配置服务器集中的管理所有服务的各种环境配置文件。配置服务中心默认采用Git的方式进行存储，因此我们很容易部署修改，并可以对环境配置进行版本管理。</p>
 <h1 id="Spring-Cloud-Config特点"><a href="#Spring-Cloud-Config特点" class="headerlink" title="Spring Cloud Config特点"></a>Spring Cloud Config特点</h1><p>Spring Cloud Config具有中心化、版本控制、支持动态更新和语言独立等特性。其特点是:</p>
 <ul>
 <li>提供服务端和客户端支持(Spring Cloud Config Server和Spring Cloud Config Client);</li>
@@ -592,7 +595,7 @@
 <p>当我们使用yml类型的文件进行配置时，如果模式属性是一个YAML数组，也可以使用YAML数组格式来定义。这样可以设置成多个配个配置文件，如:</p>
 <p>spring:<br>  cloud:<br>    config:<br>      server:<br>        git:<br>          uri: <a href="https://github.com/spring-cloud-samples/config-repo">https://github.com/spring-cloud-samples/config-repo</a><br>          repos:<br>            development:<br>              pattern:<br>                - */development<br>                - */staging<br>              uri: <a href="https://github.com/development/config-repo">https://github.com/development/config-repo</a><br>            staging:<br>              pattern:<br>                - */qa<br>                - */production<br>              uri: <a href="https://github.com/staging/config-repo">https://github.com/staging/config-repo</a><br>2.1.3 搜索目录<br>当我们把配置文件存放在Git仓库中子目录中时，可以通过设置serch-path来指定该目录。同样，serch-path也支持上面的占位符。示例如下:</p>
 <p>spring.cloud.config.server.git.uri=<a href="https://github.com/spring-cloud-samples/config-repo">https://github.com/spring-cloud-samples/config-repo</a><br>spring.cloud.config.server.git.searchPaths=foo,bar*<br>这样系统就会自动搜索foo的子目录，以及以bar开头的文件夹中的子目录。</p>
-<p>2.1.4 SSH配置<br>如果你不想使用HTTPS和用户认证，也可以直接使用SSH，这时候我们只需要将ssh需要的keys存储在～/.ssh目录即可，并将所配置的uri指向SSH地址即可，如：<a href="mailto:&#x67;&#105;&#116;&#x40;&#x67;&#105;&#116;&#104;&#x75;&#x62;&#x2e;&#99;&#111;&#x6d;">&#x67;&#105;&#116;&#x40;&#x67;&#105;&#116;&#104;&#x75;&#x62;&#x2e;&#99;&#111;&#x6d;</a>:cd826/SpringcloudSamplesConfig。</p>
+<p>2.1.4 SSH配置<br>如果你不想使用HTTPS和用户认证，也可以直接使用SSH，这时候我们只需要将ssh需要的keys存储在～/.ssh目录即可，并将所配置的uri指向SSH地址即可，如：<a href="mailto:&#x67;&#105;&#116;&#x40;&#x67;&#105;&#116;&#x68;&#117;&#98;&#x2e;&#x63;&#111;&#x6d;">&#x67;&#105;&#116;&#x40;&#x67;&#105;&#116;&#x68;&#117;&#98;&#x2e;&#x63;&#111;&#x6d;</a>:cd826/SpringcloudSamplesConfig。</p>
 <p>如果你清楚的知道你的~/.git目录，那么你可以使用git config –global来配置。否则可以使用全局配置，比如：git config –global http.sslVerify false。</p>
 <p>2.1.4 代理<br>Config-Server会使用JGit访问配置库，因此我们可以在~/.git/config下配置HTTPS所使用的代理，也可以使用JVM系统属性-Dhttps.proxyHost和-Dhttps.proxyPort来配置。</p>
 <p>2.1.5 本地缓存<br>当Config-Server从Git(或SVN)中获取了配置信息后，将会在本地的文件系统中存储一份。默认将存储在系统临时目录下，并且以config-repo-作为开头，在Linux系统中默认存储的目录为/tmp/config-repo-<randomid>。Config-Server将配置信息存储在本地可以有效的防止当Git仓库出现故障而无法访问的问题，当Config-Server无法访问到Git仓库时就会读取之前存储在本地文件中的配置，然后将这些配置信息返回给Config-Client。比如，当我们断开网络进行测试，当我们启动Config-Server时会在控制台中看到以下输出：</p>
@@ -659,7 +662,7 @@ spring.cloud.config.server.svn.password=password
 <li><p>TwoStepsFromJava Cloud – Config Server</p>
 </li>
 <li></li>
-<li><p>@author CD826(<a href="mailto:&#x43;&#x44;&#56;&#x32;&#54;&#68;&#111;&#110;&#103;&#64;&#103;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#99;&#111;&#109;">&#x43;&#x44;&#56;&#x32;&#54;&#68;&#111;&#110;&#103;&#64;&#103;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#99;&#111;&#109;</a>)</p>
+<li><p>@author CD826(<a href="mailto:&#x43;&#x44;&#56;&#x32;&#54;&#68;&#x6f;&#110;&#x67;&#64;&#x67;&#109;&#x61;&#x69;&#x6c;&#46;&#x63;&#x6f;&#x6d;">&#x43;&#x44;&#56;&#x32;&#54;&#68;&#x6f;&#110;&#x67;&#64;&#x67;&#109;&#x61;&#x69;&#x6c;&#46;&#x63;&#x6f;&#x6d;</a>)</p>
 </li>
 <li><p>@since 1.0.0</p>
 </li>
@@ -686,7 +689,7 @@ spring.cloud.config.server.svn.password=password
 <li><p>TwoStepsFromJava Cloud – Config Client Project</p>
 </li>
 <li></li>
-<li><p>@author CD826(<a href="mailto:&#x43;&#x44;&#56;&#50;&#x36;&#68;&#x6f;&#110;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#x6f;&#109;">&#x43;&#x44;&#56;&#50;&#x36;&#68;&#x6f;&#110;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#x6f;&#109;</a>)</p>
+<li><p>@author CD826(<a href="mailto:&#x43;&#x44;&#56;&#x32;&#x36;&#x44;&#x6f;&#110;&#x67;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#109;">&#x43;&#x44;&#56;&#x32;&#x36;&#x44;&#x6f;&#110;&#x67;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#109;</a>)</p>
 </li>
 <li><p>@since 1.0.0</p>
 </li>

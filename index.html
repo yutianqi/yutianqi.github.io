@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta property="og:type" content="website">
@@ -286,7 +286,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>对于配置的重要性，我想我不用进行任何强调，大家都可以明白其重要性。在普通单体应用，我们常使用配置文件(application(*).properties(yml))管理应用的所有配置。这些配置文件在单体应用中非常胜任其角色，并没有让我们感觉到有头疼的地方。但随着微服务框架的引入，微服务数量就会在我们产品中不断增加，之前我们重点考虑的是系统的可伸缩、可扩展性好，但随之就是配置管理的问题就会一一暴露出来。起初微服务器各自管各自的配置，在开发阶段并没什么问题，但到了生产环境管理就会很头疼，如果要大规模更新某项配置，困难就可想而知。<br>为此，在分布式系统中，Spring Cloud提供一个Config子项目，该项目核心就是配置中心，通过一个服务端和多个客户端实现配置服务。我们可使用配置服务器集中的管理所有服务的各种环境配置文件。配置服务中心默认采用Git的方式进行存储，因此我们很容易部署修改，并可以对环境配置进行版本管理。</p>
+          <p>SpringCloud笔记：统一配置中心入门。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2018/12/04/Spring-Cloud-Config/#more" rel="contents">
