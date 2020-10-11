@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文结合递归、map 和 reduce，以及 pipeline 等技术，对比了非函数式编程和函数式编程在解决相同问题时的不同处理思路，让你对函数式编程范式有了清晰明确的认知。并在文末引入了 decorator(修饰器)，使得将普通函数管道化成为一件轻而易举的事情。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[转载]左耳朵耗子：什么是函数式编程">
+<meta property="og:url" content="http://example.com/2018/05/15/%E5%B7%A6%E8%80%B3%E6%9C%B5%E8%80%97%E5%AD%90%EF%BC%9A%E4%BB%80%E4%B9%88%E6%98%AF%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%EF%BC%9F/index.html">
+<meta property="og:site_name" content="Duke">
+<meta property="og:description" content="本文结合递归、map 和 reduce，以及 pipeline 等技术，对比了非函数式编程和函数式编程在解决相同问题时的不同处理思路，让你对函数式编程范式有了清晰明确的认知。并在文末引入了 decorator(修饰器)，使得将普通函数管道化成为一件轻而易举的事情。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://5b0988e595225.cdn.sohucs.com/images/20180212/f99feac016bf4663809955858181eb2c.jpeg">
+<meta property="article:published_time" content="2018-05-15T07:28:23.000Z">
+<meta property="article:modified_time" content="2020-10-10T16:42:49.784Z">
+<meta property="article:author" content="Duke">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="程序员的自我修养">
+<meta property="article:tag" content="函数式编程">
+<meta property="article:tag" content="转载">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://5b0988e595225.cdn.sohucs.com/images/20180212/f99feac016bf4663809955858181eb2c.jpeg">
+
+<link rel="canonical" href="http://example.com/2018/05/15/%E5%B7%A6%E8%80%B3%E6%9C%B5%E8%80%97%E5%AD%90%EF%BC%9A%E4%BB%80%E4%B9%88%E6%98%AF%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%EF%BC%9F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>[转载]左耳朵耗子：什么是函数式编程 | Duke</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Duke</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/05/15/%E5%B7%A6%E8%80%B3%E6%9C%B5%E8%80%97%E5%AD%90%EF%BC%9A%E4%BB%80%E4%B9%88%E6%98%AF%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%EF%BC%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://s.gravatar.com/avatar/761871be255f7ab6137305690ea386ac?s=80">
+      <meta itemprop="name" content="Duke">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Duke">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [转载]左耳朵耗子：什么是函数式编程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-05-15 15:28:23" itemprop="dateCreated datePublished" datetime="2018-05-15T15:28:23+08:00">2018-05-15</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文结合递归、map 和 reduce，以及 pipeline 等技术，对比了非函数式编程和函数式编程在解决相同问题时的不同处理思路，让你对函数式编程范式有了清晰明确的认知。并在文末引入了 decorator(修饰器)，使得将普通函数管道化成为一件轻而易举的事情。</p>
+<a id="more"></a>
+
+<p>我们知道，虽然C语言简单灵活，能够让程序员在高级语言特性之上轻松进行底层上的微观控制，被誉为“高级语言中的汇编语言”，但其基于过程和底层的设计初衷又成了它的短板。</p>
+<p>在程序世界中，编程工作更多的是解决业务上的问题，而不是计算机的问题，我们需要更为贴近业务更为抽象的语言，如面向对象语言C++和Java等。</p>
+<p>C++很大程度上解决了C语言中的各种问题和不便，尤其是通过类、模板、虚函数和运行时识别等解决了C语言的泛型编程问题。然而，如何做更为抽象的泛型呢？答案就是函数式编程(Functional Programming)。</p>
+<h2 id="函数式编程"><a href="#函数式编程" class="headerlink" title="函数式编程"></a>函数式编程</h2><p>相对于计算机的历史而言，函数式编程其实是一个非常古老的概念。函数式编程的基础模型来源于λ演算，而λ演算并非设计于在计算机上执行。它是由Alonzo Church和Stephen Cole Kleene在20世纪30年代引入的一套用于研究函数定义、函数应用和递归的形式系统。<br>如Alonzo所说，像booleans、integers或者其他的数据结构都可以被函数取代掉。<br>我们来看一下函数式编程，它的理念就是借用于数学中的代数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">f(x)=<span class="number">5</span>x^<span class="number">2</span>+<span class="number">4</span>x+<span class="number">3</span></span><br><span class="line">g(x)=<span class="number">2</span>f(x)+<span class="number">5</span>=<span class="number">10</span>x^<span class="number">2</span>+<span class="number">8</span>x+<span class="number">11</span></span><br><span class="line">h(x)=f(x)+g(x)=<span class="number">15</span>x^<span class="number">2</span>+<span class="number">12</span>x+<span class="number">14</span></span><br></pre></td></tr></table></figure>
+<p>假设 f(x) 是一个函数，g(x) 是第二个函数，把 f(x) 这个函数套下来，并展开。然后还可以定义一个由两个一元函数组合成的二元函数。还可以做递归，下面这个函数定义就是斐波那契数列。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">f(x)=f(x<span class="number">-1</span>)+f(x<span class="number">-2</span>)</span><br></pre></td></tr></table></figure>
+<p>对于函数式编程来说，其只关心，定义输入数据和输出数据相关的关系，数学表达式里面其实是在做一种映射(mapping)，输入的数据和输出的数据关系是什么样的，是用函数来定义的。</p>
+<h3 id="函数式编程的特点"><a href="#函数式编程的特点" class="headerlink" title="函数式编程的特点"></a>函数式编程的特点</h3><h4 id="特征："><a href="#特征：" class="headerlink" title="特征："></a>特征：</h4><ul>
+<li>stateless：函数不维护任何状态。函数式编程的核心精神是 stateless，简而言之就是它不能存在状态，你给我数据我处理完扔出来，里面的数据是不变的。</li>
+<li>immutable：输入数据是不能动的，动了输入数据就有危险，所以要返回新的数据集。</li>
+</ul>
+<h4 id="优势："><a href="#优势：" class="headerlink" title="优势："></a>优势：</h4><ul>
+<li>没有状态就没有伤害。</li>
+<li>并行执行无伤害。</li>
+<li>Copy-Paste 重构代码无伤害。</li>
+<li>函数的执行没有顺序上的问题。</li>
+</ul>
+<h4 id="函数式编程额外带来的好处："><a href="#函数式编程额外带来的好处：" class="headerlink" title="函数式编程额外带来的好处："></a>函数式编程额外带来的好处：</h4><ul>
+<li>惰性求值<br>这需要编译器的支持。表达式不在它被绑定到变量之后就立即求值，而是在该值被取用的时候求值。也就是说，语句如x:=expression;(把一个表达式的结果赋值给一个变量)显式地调用这个表达式被计算并把结果放置到x中，但是先不管实际在x中的是什么，直到通过后面的表达式中到x的引用而有了对它的值的需求的时候，而后面表达式自身的求值也可以被延迟，最终为了生成让外界看到的某个符号而计算这个快速增长的依赖树。</li>
+<li>确定性<br>所谓确定性，就是像在数学中那样，f(x)=y这个函数无论在什么场景下，都会得到同样的结果，这个我们称之为函数的确定性。而不是像程序中的很多函数那样，同一个参数，却会在不同的场景下计算出不同的结果。所谓不同的场景，就是我们的函数会根据运行中的状态信息的不同而发生变化。       </li>
+</ul>
+<p>我们知道，因为状态，在并行执行和copy-paste时引发bug的概率是非常高的，所以没有状态就没有伤害，就像没有依赖就没有伤害一样，并行执行无伤害，copy代码无伤害，因为没有状态，代码怎样拷都行。</p>
+<h4 id="劣势："><a href="#劣势：" class="headerlink" title="劣势："></a>劣势：</h4><ul>
+<li>数据复制比较严重<br>有一些人可能会觉得这会对性能造成影响。其实，这个劣势并不见得会导致性能不好。因为没有状态，所以代码在并行上根本不需要锁(不需要对状态修改的锁)，所以可以拼命地并发，反而可以让性能很不错。比如：Erlang就是其中的代表。</li>
+</ul>
+<h4 id="各语言对函数式编程的支持程度："><a href="#各语言对函数式编程的支持程度：" class="headerlink" title="各语言对函数式编程的支持程度："></a>各语言对函数式编程的支持程度：</h4><p>对于纯函数式(也就是完全没有状态的函数)的编程来说，各个语言支持的程度如下：</p>
+<ul>
+<li>完全纯函数式：Haskell</li>
+<li>容易写纯函数：F#,Ocaml,Clojure,Scala</li>
+<li>纯函数需要花点精力：C#,Java,Java</li>
+</ul>
+<p>完全纯函数的语言，很容易写成函数，纯函数需要花精力。只要所谓的纯函数的问题，传进来的数据不改，改完的东西复制一份拷出去，然后没有状态。<br>但是很多人并不习惯函数式编程，因为函数式编程和过程式编程的思维方式完全不一样。过程式编程是在把具体的流程描述出来，所以可以不假思索，而函数式编程的抽象度更大，在实现方式上，函数套函数，函数返回函数，函数里定义函数……把人搞得很糊涂。</p>
+<h3 id="函数式编程用到的技术"><a href="#函数式编程用到的技术" class="headerlink" title="函数式编程用到的技术"></a>函数式编程用到的技术</h3><p>下面是函数式编程用到的一些技术：</p>
+<ul>
+<li><p><strong>first class function(头等函数)</strong><br>这个技术可以让你的函数就像变量一样来使用。也就是说，你的函数可以像变量一样被创建、修改，并当成变量一样传递、返回，或是在函数中嵌套函数。</p>
+</li>
+<li><p><strong>tail recursion optimization(尾递归优化)</strong><br>我们知道递归的害处，那就是如果递归很深的话，stack受不了，并会导致性能大幅度下降。因此，我们使用尾递归优化技术——每次递归时都会重用stack，这样能够提升性能。当然，这需要语言或编译器的支持。Python就不支持。</p>
+</li>
+<li><p><strong>map&amp;reduce</strong><br>这个技术不用多说了，函数式编程最常见的技术就是对一个集合做Map和Reduce操作。这比起过程式的语言来说，在代码上要更容易阅读。(传统过程式的语言需要使用for/while循环，然后在各种变量中把数据倒过来倒过去的)这个很像C++STL中foreach、find_if、count_if等函数的玩法。</p>
+</li>
+<li><p><strong>pipeline(管道)</strong><br>这个技术的意思是，将函数实例成一个一个的action，然后将一组action放到一个数组或是列表中，再把数据传给这个action list，数据就像一个pipeline一样顺序地被各个函数所操作，最终得到我们想要的结果。</p>
+</li>
+<li><p><strong>recursing(递归)</strong><br>递归最大的好处就简化代码，它可以把一个复杂的问题用很简单的代码描述出来。注意：递归的精髓是描述问题，而这正是函数式编程的精髓。</p>
+</li>
+<li><p><strong>currying(柯里化)</strong><br>将一个函数的多个参数分解成多个函数，然后将函数多层封装起来，每层函数都返回一个函数去接收下一个参数，这可以简化函数的多个参数。在C++中，这很像STL中的bind1st或是bind2nd。</p>
+</li>
+<li><p><strong>higher order function(高阶函数)</strong><br>所谓高阶函数就是函数当参数，把传入的函数做一个封装，然后返回这个封装函数。现象上就是函数传进传出，就像面向对象对象满天飞一样。这个技术用来做Decorator很不错。</p>
+</li>
+</ul>
+<h3 id="函数式编程举例"><a href="#函数式编程举例" class="headerlink" title="函数式编程举例"></a>函数式编程举例</h3><p>上面这些技术太抽象了，我们还是从一个最简单的例子开始。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//非函数式，不是pure funciton，有状态</span><br><span class="line">int cnt;</span><br><span class="line">void increment()</span><br><span class="line">&#123;</span><br><span class="line">    cnt++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里有个全局变量，调这个全局函数变量++，这里面是有状态的，这个状态在外部。所以，如果是多线程的话，这里面的代码是不安全的。<br>如果写成纯函数，应该是下面这个样子。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">//函数式，pure function，无状态</span><br><span class="line">int increment(int cnt)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> cnt+<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个是你传给我什么，我就返回这个值的+1值，你会发现，代码随便拷，而且与线程无关，代码在并行时候不用锁，因为是复制了原有的数据，并返回了新的数据。<br>我们再来看另一个例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span>(<span class="params">x</span>):</span> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">incx</span>(<span class="params">y</span>):</span> </span><br><span class="line">        <span class="keyword">return</span> x+y </span><br><span class="line">    <span class="keyword">return</span> incx</span><br><span class="line">inc2 = inc(<span class="number">2</span>)</span><br><span class="line">inc5 = inc(<span class="number">5</span>)</span><br><span class="line"><span class="keyword">print</span> inc2(<span class="number">5</span>)               <span class="comment"># 输出 7</span></span><br><span class="line"><span class="keyword">print</span> inc5(<span class="number">5</span>)               <span class="comment"># 输出 10</span></span><br></pre></td></tr></table></figure>
+<p>上面这段 Python 的代码，开始有点复杂了。我们可以看到上面那个例子inc()函数返回了另一个函数incx()，于是可以用inc()函数来构造各种版本的inc函数，比如：inc2()和inc5()。这个技术其实就是上面所说的currying技术。从这个技术上，你可能体会到函数式编程的理念。<br>把函数当成变量来用，关注描述问题而不是怎么实现，这样可以让代码更易读。因为函数返回里面的这个函数，所以函数关注的是表达式，关注的是描述这个问题，而不是怎么实现这个事情。   </p>
+<h2 id="Lisp-语言介绍"><a href="#Lisp-语言介绍" class="headerlink" title="Lisp 语言介绍"></a>Lisp 语言介绍</h2><p>要说函数式语言，不可避免地要说一下 Lisp。<br>下面，我们再来看看Scheme语言(Lisp 的一个方言)的函数式玩法。在Scheme里，所有的操作都是函数，包括加减乘除这样的东西。所以，一个表达式是这样的形式——(函数名 参数1 参数2)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(define (plus x y)  (+ x y))            <span class="comment"># 用内置的 + 函数定义了一个新 plus函数</span></span><br><span class="line">(define (times x y) (* x y))            <span class="comment"># 用内置的 * 函数定义了一个新的times函数</span></span><br><span class="line">(define (square x)  (times x x))        <span class="comment"># 用之前的 times 函数定义了一个square函数</span></span><br></pre></td></tr></table></figure>
+<p>下面这个函数定义了f(x)=5*x^2+10</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">;;; f(x)=<span class="number">5</span>*x^<span class="number">2</span>+<span class="number">10</span></span><br><span class="line">( define </span><br><span class="line">    (f x) </span><br><span class="line">        (plus <span class="number">10</span> (times <span class="number">5</span> (square x))) </span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>也可以这样定义——使用lambda匿名函数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(define f </span><br><span class="line">    (<span class="keyword">lambda</span> (x) </span><br><span class="line">        (define plus </span><br><span class="line">            (<span class="keyword">lambda</span> (a b) (+ a b))) </span><br><span class="line">        (define times </span><br><span class="line">            (<span class="keyword">lambda</span> (a b) (* a b))) </span><br><span class="line">        (plus <span class="number">10</span> (times <span class="number">5</span> (times x x)))</span><br><span class="line">    )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>在上面的这个代码里，我们使用lambda来定义函数f，然后也同样用lambda定义了两个函数：plus和times。最后，由(plus 10 (times 5 (times x x)))定义了f。<br>我们再来看一个阶乘的示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">;;; recursion</span><br><span class="line">(define factoral (<span class="keyword">lambda</span> (x) </span><br><span class="line">                    (<span class="keyword">if</span> (&lt;= x <span class="number">1</span>) <span class="number">1</span> </span><br><span class="line">                        (* x (factoral (- x <span class="number">1</span>))))))</span><br><span class="line">(newline)</span><br><span class="line">(display(factoral <span class="number">6</span>))</span><br></pre></td></tr></table></figure>
+<p>下面是另一个版本的，使用了尾递归。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">;;; another version of recursion</span><br><span class="line">(define (factoral_x n) </span><br><span class="line">    (define (iter product counter) </span><br><span class="line">        (<span class="keyword">if</span> (&gt; counter n) </span><br><span class="line">            product </span><br><span class="line">            (iter (* counter product) (+ counter <span class="number">1</span>)))) </span><br><span class="line">    (iter <span class="number">1</span> <span class="number">1</span>))</span><br><span class="line">(newline)</span><br><span class="line">(display(factoral_x <span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+
+<h2 id="函数式编程的思维方式"><a href="#函数式编程的思维方式" class="headerlink" title="函数式编程的思维方式"></a>函数式编程的思维方式</h2><p>前面提到过多次，函数式编程关注的是：describe what to do, rather than how to do it。<br>于是，我们把以前的过程式编程范式叫做 Imperative Programming – 指令式编程，而把函数式编程范式叫做 Declarative Programming – 声明式编程。</p>
+<h2 id="传统方式的写法"><a href="#传统方式的写法" class="headerlink" title="传统方式的写法"></a>传统方式的写法</h2><p>下面我们看一下相关的示例。比如，我们有3辆车比赛，简单起见，我们分别给这3辆车有70%的概率可以往前走一步，一共有5次机会，然后打出每一次这3辆车的前行状态。<br>对于Imperative Programming来说，代码如下(Python)：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> random <span class="keyword">import</span> random</span><br><span class="line">time = <span class="number">5</span></span><br><span class="line">car_positions = [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]</span><br><span class="line"><span class="keyword">while</span> time:    </span><br><span class="line">    time -= <span class="number">1</span>                               <span class="comment"># decrease time</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">&#x27;&#x27;</span> </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(car_positions)):     </span><br><span class="line">        <span class="keyword">if</span> random() &gt; <span class="number">0.3</span>: </span><br><span class="line">            car_positions[i] += <span class="number">1</span>           <span class="comment"># move car </span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">&#x27;-&#x27;</span> * car_positions[i]        <span class="comment"># draw car </span></span><br></pre></td></tr></table></figure>
+<p>我们可以把这两重循环变成一些函数模块，这样有利于更容易地阅读代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> random <span class="keyword">import</span> random</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">move_cars</span>():</span> </span><br><span class="line">    <span class="keyword">for</span> i, _ <span class="keyword">in</span> enumerate(car_positions): </span><br><span class="line">        <span class="keyword">if</span> random() &gt; <span class="number">0.3</span>: </span><br><span class="line">            car_positions[i] += <span class="number">1</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">draw_car</span>(<span class="params">car_position</span>):</span> </span><br><span class="line">    <span class="keyword">print</span> <span class="string">&#x27;-&#x27;</span> * car_position</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_step_of_race</span>():</span> </span><br><span class="line">    <span class="keyword">global</span> time </span><br><span class="line">    time -= <span class="number">1</span> </span><br><span class="line">    move_cars()</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">draw</span>():</span> </span><br><span class="line">    <span class="keyword">print</span> <span class="string">&#x27;&#x27;</span> </span><br><span class="line">    <span class="keyword">for</span> car_position <span class="keyword">in</span> car_positions: </span><br><span class="line">        draw_car(car_position)</span><br><span class="line">time = <span class="number">5</span></span><br><span class="line">car_positions = [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]</span><br><span class="line"><span class="keyword">while</span> time: </span><br><span class="line">    run_step_of_race() </span><br><span class="line">    draw()</span><br></pre></td></tr></table></figure>
+<p>上面的代码，从主循环开始，我们可以很清楚地看到程序的主干，因为我们把程序的逻辑分成了几个函数。这样一来，代码逻辑就会变成几个小碎片，于是我们读代码时要考虑的上下文就少了很多，阅读代码也会更容易。不像第一个示例，如果没有注释和说明，你还是需要花些时间理解一下。而将代码逻辑封装成了函数后，我们就相当于给每个相对独立的程序逻辑取了个名字，于是代码成了自解释的。<br>但是，你会发现，封装成函数后，这些函数都会依赖于共享的变量来同步其状态。于是，在读代码的过程中，每当我们进入到函数里，读到访问了一个外部的变量时，我们马上要去查看这个变量的上下文，然后还要在大脑里推演这个变量的状态，才能知道程序的真正逻辑。也就是说，这些函数间必需知道其它函数是怎么修改它们之间的共享变量的，所以，这些函数是有状态的。</p>
+<h2 id="函数式的写法"><a href="#函数式的写法" class="headerlink" title="函数式的写法"></a>函数式的写法</h2><p>我们知道，有状态并不是一件很好的事情，无论是对代码重用，还是对代码的并行来说，都是有副作用的。因此，要想个方法把这些状态搞掉，于是出现了函数式编程的编程范式。下面，我们来看看函数式的方式应该怎么写？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> random <span class="keyword">import</span> random</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">move_cars</span>(<span class="params">car_positions</span>):</span> </span><br><span class="line">    <span class="keyword">return</span> map(<span class="keyword">lambda</span> x: x + <span class="number">1</span> <span class="keyword">if</span> random() &gt; <span class="number">0.3</span> <span class="keyword">else</span> x, car_positions)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">output_car</span>(<span class="params">car_position</span>):</span> </span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;-&#x27;</span> * car_position</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_step_of_race</span>(<span class="params">state</span>):</span> </span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">&#x27;time&#x27;</span>:state[<span class="string">&#x27;time&#x27;</span>]<span class="number">-1</span>, <span class="string">&#x27;car_positions&#x27;</span>: move_cars(state[<span class="string">&#x27;car_positions&#x27;</span>])&#125;</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">draw</span>(<span class="params">state</span>):</span> </span><br><span class="line">    <span class="keyword">print</span> <span class="string">&#x27;&#x27;</span> </span><br><span class="line">    <span class="keyword">print</span> <span class="string">&#x27;\n&#x27;</span>.join(map(output_car, state[<span class="string">&#x27;car_positions&#x27;</span>]))</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">race</span>(<span class="params">state</span>):</span> </span><br><span class="line">    draw(state) </span><br><span class="line">    <span class="keyword">if</span> state[<span class="string">&#x27;time&#x27;</span>]: </span><br><span class="line">        race(run_step_of_race(state))</span><br><span class="line">race(&#123;<span class="string">&#x27;time&#x27;</span>: <span class="number">5</span>, <span class="string">&#x27;car_positions&#x27;</span>: [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]&#125;)</span><br></pre></td></tr></table></figure>
+<p>上面的代码依然把程序的逻辑分成了函数。不过这些函数都是函数式的，它们有三个特点：它们之间没有共享的变量；函数间通过参数和返回值来传递数据；在函数里没有临时变量。</p>
+<p>我们还可以看到，for循环被递归取代了(见race函数)—— 递归是函数式编程中常用到的技术，正如前面所说的，递归的本质就是描述问题是什么。</p>
+<h2 id="函数式语言的三套件"><a href="#函数式语言的三套件" class="headerlink" title="函数式语言的三套件"></a>函数式语言的三套件</h2><p>函数式语言有三套件，Map、Reduce和Filter。这在谈C++的泛型编程时已经介绍过。下面我们来看一下Python语言中的一个示例。这个示例的需求是，我们想把一个字符串数组中的字符串都转成小写。<br>用常规的面向过程的方式，代码如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 传统的非函数式</span></span><br><span class="line">upname =[<span class="string">&#x27;HAO&#x27;</span>, <span class="string">&#x27;CHEN&#x27;</span>, <span class="string">&#x27;COOLSHELL&#x27;</span>]</span><br><span class="line">lowname =[] </span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(upname)): </span><br><span class="line">    lowname.append(upname[i].lower())</span><br></pre></td></tr></table></figure>
+<p>如果写成函数式，用map()函数，是下面这个样子。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 函数式</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">toUpper</span>(<span class="params">item</span>):</span> </span><br><span class="line">    <span class="keyword">return</span> item.upper()</span><br><span class="line">upper_name = map(toUpper, [<span class="string">&quot;hao&quot;</span>, <span class="string">&quot;chen&quot;</span>, <span class="string">&quot;coolshell&quot;</span>])</span><br><span class="line"><span class="keyword">print</span> upper_name                   </span><br><span class="line"><span class="comment"># 输出 [&#x27;HAO&#x27;, &#x27;CHEN&#x27;, &#x27;COOLSHELL&#x27;]</span></span><br></pre></td></tr></table></figure>
+<p>顺便说一下，上面的例子是不是和我们 C++ 语言中的 STL 的 transform() 函数有些像？</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">string</span> s=<span class="string">&quot;hello&quot;</span>;</span><br><span class="line">transform(s.begin(), s.end(), back_inserter(out), ::<span class="built_in">toupper</span>);</span><br></pre></td></tr></table></figure>
+<p>在上面Python的那个例子中可以看到，我们定义了一个函数toUpper，这个函数没有改变传进来的值，只是把传进来的值做个简单的操作，然后返回。然后，我们把其用在map函数中，就可以很清楚地描述出我们想要干什么。而不会去理解一个在循环中怎么实现的代码，最终在读了很多循环的逻辑后才发现原来是这个或那个意思。<br>如果你觉得上面的代码在传统的非函数式的方式下还是很容易读的，那么我们再来看一个计算数组平均值的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算数组中正数的平均值</span></span><br><span class="line">num = [<span class="number">2</span>, <span class="number">-5</span>, <span class="number">9</span>, <span class="number">7</span>, <span class="number">-2</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">-3</span>, <span class="number">8</span>]</span><br><span class="line">positive_num_cnt = <span class="number">0</span></span><br><span class="line">positive_num_sum = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(num)): </span><br><span class="line">    <span class="keyword">if</span> num[i] &gt; <span class="number">0</span>: </span><br><span class="line">        positive_num_cnt += <span class="number">1</span> </span><br><span class="line">        positive_num_sum += num[i]</span><br><span class="line"><span class="keyword">if</span> positive_num_cnt &gt; <span class="number">0</span>: </span><br><span class="line">    average = positive_num_sum / positive_num_cnt</span><br><span class="line">    <span class="keyword">print</span> average</span><br></pre></td></tr></table></figure>
+<p>上面的代码如果没有注释的话，你需要看一会儿才能明白，只是计算数组中正数的平均值。<br>我们再来看看函数式下使用 filter/reduce 函数的玩法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算数组中正数的平均值</span></span><br><span class="line">positive_num = filter(<span class="keyword">lambda</span> x: x&gt;<span class="number">0</span>, num)</span><br><span class="line">average = reduce(<span class="keyword">lambda</span> x,y: x+y, positive_num)/len(positive_num)</span><br></pre></td></tr></table></figure>
+<p>首先，我们使用 filter 函数把正数过滤出来(注意：lambda x: x&gt;0 这个lambda表达式)，保存在一个新的数组(positive_num)中。然后，我们使用reduce函数对数组positive_num求和后，再除以其个数，就得到正数的平均值了。<br>我们可以看到，隐藏了数组遍历并过滤数组控制流程的filter和reduce，不仅让代码更为简洁，因为代码里只有业务逻辑了，而且让我们能更容易地理解代码。<br>对num数组filter条件x&gt;0的数据。然后对positive_num进行x+y操作的reduce，即求和。<br>感觉代码更亲切了，不是吗？因为：</p>
+<ul>
+<li>数据集、对数据的操作和返回值都放在了一起。</li>
+<li>没有了循环体，就可以少了些临时用来控制程序执行逻辑的变量，也少了把数据倒来倒去的控制逻辑。</li>
+<li>代码变成了在描述你要干什么，而不是怎么干。</li>
+</ul>
+<p>当然，如果你是第一次见到 map/reduce/filter，那你可能还是会有点儿陌生和不解，这只是你不了解罢了。<br>对于函数式编程的思路，下图是一个比较形象的例子，面包和蔬菜map到切碎的操作上，再把结果给reduce成汉堡。<br><img src="http://5b0988e595225.cdn.sohucs.com/images/20180212/f99feac016bf4663809955858181eb2c.jpeg" alt="img"><br>在这个图中，我们可以看到 map 和 reduce 不关心源输入数据，它们只是控制，并不是业务。控制是描述怎么干，而业务是描述要干什么。</p>
+<h2 id="函数式的pipeline模式"><a href="#函数式的pipeline模式" class="headerlink" title="函数式的pipeline模式"></a>函数式的pipeline模式</h2><p>pipeline(管道)借鉴于Unix Shell的管道操作——把若干个命令串起来，前面命令的输出成为后面命令的输入，如此完成一个流式计算。(注：管道绝对是一个伟大的发明，它的设计哲学就是KISS – 让每个功能就做一件事，并把这件事做到极致，软件或程序的拼装会变得更为简单和直观。这个设计理念影响非常深远，包括今天的Web Service、云计算，以及大数据的流式计算等。)<br>比如，我们如下的 shell 命令：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps auwwx | awk <span class="string">&#x27;&#123;print $2&#125;&#x27;</span> | sort -n | xargs echo</span><br></pre></td></tr></table></figure>
+<p>上面的例子是要查看一个用户执行的进程列表，列出来以后，然后取第二列，第二列是它的进程ID，排个序，再把它显示出来。抽象成函数式的样子，我们就可以反过来，一层套一层。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xargs( echo, sort(n, awk(<span class="string">&#x27;print $2&#x27;</span>, ps(auwwx))) )</span><br></pre></td></tr></table></figure>
+<p>我们也可以把函数放进数组里面，然后顺序执行一下。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pids = for_each(result, [ps_auwwx, awk_p2, sort_n, xargs_echo])</span><br></pre></td></tr></table></figure>
+<p>多说一句，如果我们把这些函数比作微服务，那么管道这个事是在干什么呢？其实就是在做服务的编排。像Unix这些经典的技术上的实践或理论，往往是可以反映到分布式架构的，所以，一般来说，一个好的分布式架构师，通常都是对这些传统的微观上的经典技术有非常深刻的认识，因为这些东西在方法论上都是相通的。好了，还是让我们用一个简单的示例来看一下如何实现pipeline。<br>我们先来看一个程序，这个程序的process()有三个步骤：</p>
+<ul>
+<li>找出偶数；</li>
+<li>乘以 3；</li>
+<li>转成字符串返回。</li>
+</ul>
+<p>传统的非函数式的实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process</span>(<span class="params">num</span>):</span> </span><br><span class="line">    <span class="keyword">if</span> num % <span class="number">2</span> != <span class="number">0</span>:                        <span class="comment"># filter out non-evens </span></span><br><span class="line">        <span class="keyword">return</span> </span><br><span class="line">    num = num * <span class="number">3</span> </span><br><span class="line">    num = <span class="string">&#x27;The Number: %s&#x27;</span> % num </span><br><span class="line">    <span class="keyword">return</span> num</span><br><span class="line">nums = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>]</span><br><span class="line"><span class="keyword">for</span> num <span class="keyword">in</span> nums: </span><br><span class="line">    <span class="keyword">print</span> process(num)</span><br><span class="line"><span class="comment"># 输出：</span></span><br><span class="line"><span class="comment"># None</span></span><br><span class="line"><span class="comment"># The Number: 6</span></span><br><span class="line"><span class="comment"># None</span></span><br><span class="line"><span class="comment"># The Number: 12</span></span><br><span class="line"><span class="comment"># None</span></span><br><span class="line"><span class="comment"># The Number: 18</span></span><br><span class="line"><span class="comment"># None</span></span><br><span class="line"><span class="comment"># The Number: 24</span></span><br><span class="line"><span class="comment"># None</span></span><br><span class="line"><span class="comment"># The Number: 30</span></span><br></pre></td></tr></table></figure>
+<p>我们可以看到，输出的结果并不够完美，另外，代码阅读上如果没有注释，你也会比较晕。下面，我们来看看函数式的 pipeline(第一种方式)应该怎么写？<br>第一步，我们先把三个“子需求”写成函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">even_filter</span>(<span class="params">nums</span>):</span> </span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> nums: </span><br><span class="line">        <span class="keyword">if</span> num % <span class="number">2</span> == <span class="number">0</span>: </span><br><span class="line">            <span class="keyword">yield</span> num</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">multiply_by_three</span>(<span class="params">nums</span>):</span> </span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> nums: </span><br><span class="line">        <span class="keyword">yield</span> num * <span class="number">3</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">convert_to_string</span>(<span class="params">nums</span>):</span> </span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> nums: </span><br><span class="line">        <span class="keyword">yield</span>  <span class="string">&#x27;The Number: %s&#x27;</span> % num</span><br></pre></td></tr></table></figure>
+<p>然后，我们再把这三个函数串起来：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">nums = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>]</span><br><span class="line">pipeline = convert_to_string(multiply_by_three(even_filter(nums)))</span><br><span class="line"><span class="keyword">for</span> num <span class="keyword">in</span> pipeline: </span><br><span class="line">    <span class="keyword">print</span> num</span><br><span class="line"><span class="comment"># 输出：</span></span><br><span class="line"><span class="comment"># The Number: 6</span></span><br><span class="line"><span class="comment"># The Number: 12</span></span><br><span class="line"><span class="comment"># The Number: 18</span></span><br><span class="line"><span class="comment"># The Number: 24</span></span><br><span class="line"><span class="comment"># The Number: 30</span></span><br></pre></td></tr></table></figure>
+<p>上面，我们动用了Python的关键字yield，它是一个类似return的关键字，只是这个函数返回的是Generator(生成器)。所谓生成器，指的是yield返回的是一个可迭代的对象，并没有真正的执行函数。也就是说，只有其返回的迭代对象被迭代时，yield函数才会真正运行，运行到yield语句时就会停住，然后等下一次的迭代。(yield 是个比较诡异的关键字)这就是lazy evluation(懒惰加载)。<br>好了，根据前面的原则——“使用Map&amp;Reduce，不要使用循环”(还记得吗？使用循环会让我们只能使用顺序型的数据结构)，那我们用比较纯朴的Map&amp;Reduce吧。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">even_filter</span>(<span class="params">nums</span>):</span> </span><br><span class="line">    <span class="keyword">return</span> filter(<span class="keyword">lambda</span> x: x%<span class="number">2</span>==<span class="number">0</span>, nums)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">multiply_by_three</span>(<span class="params">nums</span>):</span> </span><br><span class="line">    <span class="keyword">return</span> map(<span class="keyword">lambda</span> x: x*<span class="number">3</span>, nums)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">convert_to_string</span>(<span class="params">nums</span>):</span> </span><br><span class="line">    <span class="keyword">return</span> map(<span class="keyword">lambda</span> x: <span class="string">&#x27;The Number: %s&#x27;</span> % x, nums)    </span><br><span class="line">nums = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>]</span><br><span class="line">pipeline = convert_to_string( multiply_by_three( even_filter(nums) ) )</span><br><span class="line"><span class="keyword">for</span> num <span class="keyword">in</span> pipeline: </span><br><span class="line">    <span class="keyword">print</span> num</span><br></pre></td></tr></table></figure>
+<p>上面的代码是不是更容易读了，但需要嵌套使用函数，这个有点儿不爽，如果我们能像下面这个样子就好了(第二种方式)。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pipeline_func(nums, [even_filter, multiply_by_three, convert_to_string])</span><br></pre></td></tr></table></figure>
+<p>可以看到，其实，就是对一堆函数做一个reduce，于是，pipeline函数可以实现成下面这样：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pipeline_func</span>(<span class="params">data, fns</span>):</span> <span class="keyword">return</span> reduce(<span class="keyword">lambda</span> a, x: x(a), fns, data)</span><br></pre></td></tr></table></figure>
+<p>当然，使用Python的force函数以及decorator模式可以把上面的代码写得更像管道：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Pipe</span>(<span class="params">object</span>):</span> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, func</span>):</span> </span><br><span class="line">        self.func = func</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__ror__</span>(<span class="params">self, other</span>):</span> </span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">generator</span>():</span> </span><br><span class="line">            <span class="keyword">for</span> obj <span class="keyword">in</span> other: </span><br><span class="line">                <span class="keyword">if</span> obj <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>: </span><br><span class="line">                    <span class="keyword">yield</span> self.func(obj) </span><br><span class="line">        <span class="keyword">return</span> generator()</span><br><span class="line"><span class="meta">@Pipe</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">even_filter</span>(<span class="params">num</span>):</span> </span><br><span class="line">    <span class="keyword">return</span> num <span class="keyword">if</span> num % <span class="number">2</span> == <span class="number">0</span> <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line"><span class="meta">@Pipe</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">multiply_by_three</span>(<span class="params">num</span>):</span> </span><br><span class="line">    <span class="keyword">return</span> num*<span class="number">3</span></span><br><span class="line"><span class="meta">@Pipe</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">convert_to_string</span>(<span class="params">num</span>):</span> </span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;The Number: %s&#x27;</span> % num</span><br><span class="line"><span class="meta">@Pipe</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">echo</span>(<span class="params">item</span>):</span> </span><br><span class="line">    <span class="keyword">print</span> item </span><br><span class="line">    <span class="keyword">return</span> item</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">force</span>(<span class="params">sqs</span>):</span> </span><br><span class="line">    <span class="keyword">for</span> item <span class="keyword">in</span> sqs: </span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">nums = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>]</span><br><span class="line">force(nums | even_filter | multiply_by_three | convert_to_string | echo)</span><br></pre></td></tr></table></figure>
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>相对于计算机发展史，函数式编程是个非常古老的概念，它的核心思想是将运算过程尽量写成一系列嵌套的函数调用，关注的是做什么而不是怎么做，因而被称为声明式编程。以Stateless(无状态)和Immutable(不可变)为主要特点，代码简洁，易于理解，能便于进行并行执行，易于做代码重构，函数执行没有顺序上的问题，支持惰性求值，具有函数的确定性——无论在什么场景下都会得到同样的结果。</p>
+<p>本文结合递归、map和reduce，以及pipeline等技术，对比了非函数式编程和函数式编程在解决相同问题时的不同处理思路，让你对函数式编程范式有了清晰明确的认知。并在文末引入了decorator(修饰器)，使得将普通函数管道化成为一件轻而易举的事情。此时你可能有疑问，decorator到底是什么呢？怎样使用它呢？敬请关注下一章中的内容，来得到这些答案。</p>
+<p>作者｜陈皓<br>编辑｜杨爽</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/" rel="tag"># 程序员的自我修养</a>
+              <a href="/tags/%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" rel="tag"># 函数式编程</a>
+              <a href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag"># 转载</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/03/19/%E6%A0%91%E8%8E%93%E6%B4%BE%E4%BD%BF%E7%94%A8%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD/" rel="prev" title="树莓派使用bypy实现百度网盘上传下载">
+      <i class="fa fa-chevron-left"></i> 树莓派使用bypy实现百度网盘上传下载
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/09/29/Java%E6%B3%9B%E5%9E%8B%E8%AF%A6%E8%A7%A3/" rel="next" title="[转载]Java泛型详解">
+      [转载]Java泛型详解 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">函数式编程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">函数式编程的特点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%EF%BC%9A"><span class="nav-number">1.1.1.</span> <span class="nav-text">特征：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF%EF%BC%9A"><span class="nav-number">1.1.2.</span> <span class="nav-text">优势：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E9%A2%9D%E5%A4%96%E5%B8%A6%E6%9D%A5%E7%9A%84%E5%A5%BD%E5%A4%84%EF%BC%9A"><span class="nav-number">1.1.3.</span> <span class="nav-text">函数式编程额外带来的好处：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A3%E5%8A%BF%EF%BC%9A"><span class="nav-number">1.1.4.</span> <span class="nav-text">劣势：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%84%E8%AF%AD%E8%A8%80%E5%AF%B9%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E7%9A%84%E6%94%AF%E6%8C%81%E7%A8%8B%E5%BA%A6%EF%BC%9A"><span class="nav-number">1.1.5.</span> <span class="nav-text">各语言对函数式编程的支持程度：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E7%94%A8%E5%88%B0%E7%9A%84%E6%8A%80%E6%9C%AF"><span class="nav-number">1.2.</span> <span class="nav-text">函数式编程用到的技术</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E4%B8%BE%E4%BE%8B"><span class="nav-number">1.3.</span> <span class="nav-text">函数式编程举例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lisp-%E8%AF%AD%E8%A8%80%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text">Lisp 语言介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E7%9A%84%E6%80%9D%E7%BB%B4%E6%96%B9%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">函数式编程的思维方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E6%96%B9%E5%BC%8F%E7%9A%84%E5%86%99%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">传统方式的写法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%BC%8F%E7%9A%84%E5%86%99%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">函数式的写法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%BC%8F%E8%AF%AD%E8%A8%80%E7%9A%84%E4%B8%89%E5%A5%97%E4%BB%B6"><span class="nav-number">6.</span> <span class="nav-text">函数式语言的三套件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%BC%8F%E7%9A%84pipeline%E6%A8%A1%E5%BC%8F"><span class="nav-number">7.</span> <span class="nav-text">函数式的pipeline模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">小结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Duke"
+      src="https://s.gravatar.com/avatar/761871be255f7ab6137305690ea386ac?s=80">
+  <p class="site-author-name" itemprop="name">Duke</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Duke</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '318346c3c4bc46d12fbc',
+      clientSecret: 'f97cedefae5a6d71b608c5ef12253b5c621d69e5',
+      repo        : 'yutianqi.github.io',
+      owner       : 'yutianqi',
+      admin       : ['yutianqi'],
+      id          : '98c6bea2e1457c15f4117f47e3818db1',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
