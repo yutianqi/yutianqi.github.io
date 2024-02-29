@@ -1,0 +1,2436 @@
+<!--
+    Auther     : \u4e8e\u5929\u5947
+    Date      : 1481737888000
+-->
+
+
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>sTool</title>
+    <style type="text/css">
+        body {
+            font: 14px Consolas;
+            text-align: left;
+        }
+
+        #frame {
+            width: 1500px;
+        }
+
+        #header1 {
+            font: 19px Consolas;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        #left {
+            float: left;
+            width: 10px;
+        }
+
+        div.field {
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        div.footer {
+            margin-top: 64px;
+            text-align: left;
+            color: #C0C0C0;
+        }
+
+        div.text {
+            margin-bottom: 5px;
+            text-align: center;
+            width: 40px
+        }
+
+        input[readonly] {
+            background-color: none;
+            border: none;
+        }
+
+        textarea {
+            font: 14px Consolas;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        var blurElementId = "";
+
+        /**
+         * 页面加载初始化
+         */
+        window.onload = function () {
+            var now = new Date();
+            initTransferUtcTimeToUnixTime(now);
+            initTransferUnixTimestampToLocalTime(now);
+            initWorldTimeConvert(now);
+        }
+
+
+
+        /**
+         * 初始化各时区时间转换为Unix时间戳
+         */
+        function initTransferUtcTimeToUnixTime(jsDateTime) {
+            var localeDateString = jsDateTime.toLocaleDateString();
+            var timeString = jsDateTime.toTimeString().split(" ")[0];
+            var dateArr = localeDateString.split("/");
+            var timeArr = timeString.split(":");
+            var year = dateArr[0];
+            var month = dateArr[1];
+            var day = dateArr[2];
+            var hour = timeArr[0];
+            var minute = timeArr[1];
+            var second = timeArr[2];
+
+            document.getElementById("year").value = year;
+            document.getElementById("month").value = month;
+            document.getElementById("day").value = day;
+            document.getElementById("hour").value = hour;
+            document.getElementById("minute").value = minute;
+            document.getElementById("second").value = second;
+        }
+
+        /**
+         * 初始化Unix时间转换为各时区时间
+         */
+        function initTransferUnixTimestampToLocalTime(jsDateTime) {
+            document.getElementById("unixTimeIn1").value = parseInt(jsDateTime.valueOf() / 1000) * 1000;
+        }
+
+        /**
+         * 初始化世界标准时间转换
+         */
+        function initWorldTimeConvert(now) {
+            document.getElementById("inputZoneTime").value = convertJsDateToString(now);
+        }
+
+        /**
+         * 将各时区时间转换为Unix时间戳
+         */
+        function transferUtcTimeToUnixTime(value) {
+            var year = document.getElementById("year").value;
+            var month = document.getElementById("month").value;
+            var day = document.getElementById("day").value;
+            var hour = document.getElementById("hour").value;
+            var minute = document.getElementById("minute").value;
+            var second = document.getElementById("second").value;
+
+            var timestamp = new Date(year, month - 1, day, hour, minute, second).getTime() + (8 - value) * 3600 * 1000;
+            document.getElementById("unixTimeOut").value = timestamp;
+            // execCopy("unixTimeOut");
+        }
+
+
+        /**
+         * 将Unix时间戳转换为各时区时间
+         */
+        function transferUnixTimestampToLocalTimeJs(localTimeZone) {
+            var unixTime = fillUnixTime(document.getElementById("unixTimeIn1").value);
+            document.getElementById("unixTimeIn1").value = unixTime;
+            document.getElementById("utcTime1").value = transferUnixTimestampToLocalTimeStr(unixTime, localTimeZone);
+        }
+
+        function fillUnixTime(unixTime) {
+            unixTime = unixTime.replaceAll(" ", "").toUpperCase();
+            if (unixTime.startsWith("0X")) {
+                unixTime = unixTime.substring(2, unixTime.length);
+            }
+            if (unixTime.endsWith("L")) {
+                unixTime = unixTime.substring(0, unixTime.length - 1);
+            }
+            if (unixTime.length == 8) {
+                unixTime = parseInt(unixTime, 16).toString(10);
+            }
+            if (unixTime.length == 9 || unixTime.length == 10) {
+                unixTime += "000";
+            }
+            if (unixTime.length == 19 && unixTime.endsWith("000000")) {
+                unixTime = unixTime.substr(0, 13);
+            }
+            return unixTime;
+        }
+
+
+        function transferUnixTimestampToLocalTime(unixTime, localTimeZone) {
+            // 0时区时间
+            return new Date(parseInt(unixTime) + new Date().getTimezoneOffset() * 60000 + localTimeZone * 3600000);
+        }
+
+
+        function transferUnixTimestampToLocalTimeStr(unixTime, localTimeZone) {
+            unixTime = fillUnixTime(unixTime);
+            var commonTime = transferUnixTimestampToLocalTime(unixTime, localTimeZone);
+            return commonTime.toLocaleDateString() + " " + commonTime.toTimeString().split(" ")[0];
+        }
+
+        /**
+         * 将源时区的指定时间，转换为目标时区的时间
+         *
+         * @param inputTimeZone 源时区
+         * @param outputTimeZone 目标时区
+         * @param inputZoneTime 源时区时间
+         * @param outputZoneTimeId 页面元素ID
+         */
+        function worldTimeConvert(inputTimeZone, outputTimeZone, inputZoneTime, outputZoneTimeId) {
+            // 格式化输入时间
+            inputZoneTime = inputZoneTime.replace(/-/g, "/") + " GMT" + inputTimeZone + "00";
+            // inputZoneTime=inputZoneTime.replace(/-/g, "/");
+            // 将输入时间转换为UTC时间戳
+            date = new Date(inputZoneTime);
+
+            timestamp = date.getTime() + (date.getTimezoneOffset() / 60 + parseInt(outputTimeZone)) * 3600000;
+
+            document.getElementById(outputZoneTimeId).value = convertJsDateToString(new Date(timestamp));
+        }
+
+        /**
+         * JSON格式化
+         */
+        function formatJson() {
+            rawJson = document.getElementById("rawJson").value;
+            if (rawJson.startsWith("\"")) {
+                rawJson = rawJson.substr(1, rawJson.length - 2)
+            }
+            rawJson = rawJson.replaceAll("\\\"", "\"")
+            ret = JSON.stringify(JSON.parse(rawJson), null, "    ")
+            document.getElementById("formatedJson").value = ret
+        }
+
+        /**
+         * JSON格式化
+         */
+        function jsonToStr() {
+            ret = document.getElementById("rawJson").value
+            ret = JSON.stringify(JSON.parse(ret))
+            ret = ret.replaceAll("\"", "\\\"")
+            document.getElementById("formatedJson").value = "\"" + ret + "\""
+        }
+
+        /**
+         * transRawHeaderToCode
+         */
+        function transRawHeaderToCode() {
+            rawHeader = document.getElementById("headerCode").value;
+            lines = rawHeader.split("\n")
+            ret = ''
+            for (i = 0; i < lines.length; i++) {
+                ret += "'" + lines[i].replace(": ", "': '") + "'"
+                if (i != lines.length - 1) {
+                    ret += ",\n"
+                }
+            }
+
+            document.getElementById("headerCode").value = ret
+        }
+
+        /**
+         * 将unicode转为中文
+         */
+        function transferUnicodeToChinese() {
+            unicodeString = document.getElementById("unicodeString").value;
+            document.getElementById("chineseString").value = eval("'" + unicodeString + "'");
+            // execCopy("chineseString");
+        }
+
+        /**
+         * 将中文转为unicode
+         */
+        function transferChineseToUnicode() {
+            chineseString = document.getElementById("chineseString2").value;
+            // document.getElementById("unicodeString2").value = escape(chineseString).replace(/%/g, "\\").toLowerCase();
+
+            var ret = '';
+            const ignoreCharArray = ['(', ')', ' ', '!', ',', '.', '!'];
+            for (i = 0; i < chineseString.length; i++) {
+                // console.log(chineseString[i]);
+                var c = chineseString[i];
+                if (ignoreCharArray.indexOf(c) == -1) {
+                    encodeStr = escape(c);
+                    if (encodeStr !== c) {
+                        encodeStr = '\\u' + encodeStr.replace(/%u/g, "").replace(/%/g, "").padStart(4, "0");
+                    }
+                    ret += encodeStr;
+
+                } else {
+                    ret += c;
+                }
+            }
+            document.getElementById("unicodeString2").value = ret;
+            // execCopy("unicodeString2");
+        }
+
+        function toUnicode(str) {
+            return str.replace(/([\u4E00-\u9FA5]|[\uFE30-\uFFA0])/g, function () {
+                return "\\u" + RegExp["$1"].charCodeAt(0).toString(16);
+            });
+        }
+
+        /**
+         * 进制转换 
+         */
+        function transValue(elementId, radix) {
+            let map = {
+                "ULIMITED": [-1,],
+                "SIN_SHORT": [2],
+                "UNSIN_SHORT": [2],
+                "SIN_INT": [4, -2147483648, 2147483647, 0x100000000],
+                "UNSIN_INT": [4, 0, 4294967295, 0x100000000],
+                "SIN_LONG": [8],
+                "UNSIN_LONG": [8]
+            }
+
+            var inputValue = document.getElementById(elementId).value;
+            inputValue = inputValue.replaceAll(" ", "").replaceAll(",", "")
+            if (inputValue.length === 0) {
+                return
+            }
+            radixTrans(inputValue, radix);
+        }
+
+
+        /**
+         * 将16进制数转为其他进制 
+         */
+        function transFromHexadecimalSupportEndian() {
+            var endianValue = document.getElementById("endianValue").value;
+            var inputValue = document.getElementById("hexValue").value;
+            var bigEndianValue = "";
+            if (endianValue == "0123") {
+                bigEndianValue = inputValue;
+            } else if (endianValue == "3210") {
+                bigEndianValue = inputValue.split('').reverse().join('');
+            } else {
+                for (i = inputValue.length / 2; i > 0; i--) {
+                    bigEndianValue = bigEndianValue + inputValue.charAt(i * 2 - 2) + inputValue.charAt(i * 2 - 1);
+                }
+            }
+            radixTrans(bigEndianValue, 16);
+        }
+
+
+        /**
+         * 进制转换 
+         * 
+         * @param inputValue 原始值
+         * @param fromRadix  原始进制
+         */
+        function radixTrans(inputValue, fromRadix) {
+            /**
+             * Number(BigInt(9001) << BigInt(32))
+             * 
+             * 十进制因为涉及到有符号和无符号，需要根据数据长度做特殊处理
+             * FF对应无符号数就是255，有符号数就是-1
+             */
+            var value = parseInt(inputValue, fromRadix);
+            value = (value >= 0 ? value : 0x100000000 + value);
+            document.getElementById("binValue").value = formatValue(value.toString(2), 4, "0", 4, " ")
+            document.getElementById("octValue").value = value.toString(8);
+            document.getElementById("decValue").value = value.toString(10);
+
+            document.getElementById("hexValue").value = formatValue(value.toString(16).toUpperCase(), 2, "0", 0, "");
+        }
+
+
+        /**
+         * 字符串格式化 
+         * 
+         * @param inputValue 原始值
+         * @param fillLen 填充间隔长度
+         * @param filler 填充字符
+         * @param splitLen 分隔长度
+         * @param splitter 分隔字符
+         */
+        function formatValue(inputValue, fillLen, filler, splitLen, splitter) {
+            let fillers = "";
+            if (fillLen != 0) {
+                let modValue = inputValue.length % fillLen
+                if (modValue != 0) {
+                    for (i = 0; i < fillLen - modValue; i++) {
+                        fillers += filler;
+                    }
+                }
+                inputValue = fillers + inputValue;
+            }
+
+            let formatedValue = "";
+            if (splitLen != 0) {
+                let counter = 0;
+                for (i = inputValue.length - 1; i >= 0; i--) {
+                    if (counter % splitLen == 0 && counter != 0) {
+                        formatedValue = splitter + formatedValue;
+                    }
+                    formatedValue = inputValue[i] + formatedValue;
+                    counter += 1;
+                }
+            } else {
+                return inputValue;
+            }
+            return formatedValue;
+        }
+
+
+        /**
+         * 进制转换 
+         * 
+         * @param inputValue 原始值
+         * @param fromRadix  原始进制
+         */
+        function radixTransSupportEndin(inputValue, fromRadix) {
+            document.getElementById("binValue").value = parseInt(inputValue, fromRadix).toString(2);
+            document.getElementById("octValue").value = parseInt(inputValue, fromRadix).toString(8);
+            document.getElementById("decValue").value = parseInt(inputValue, fromRadix).toString(10);
+
+            var hexValue = parseInt(inputValue, fromRadix).toString(16).toUpperCase();
+            if (hexValue.length % 2 == 1) {
+                hexValue = "0" + hexValue;
+            }
+            if (fromRadix != 16) {
+                document.getElementById("hexValue").value = hexValue;
+            }
+
+            var hexValue1 = hexValue;
+            document.getElementById("hexValue1").value = hexValue;
+
+            var hexValue2 = hexValue.split('').reverse().join('');
+            document.getElementById("hexValue2").value = hexValue2;
+
+            var hexValue3 = "";
+            for (i = hexValue.length / 2; i > 0; i--) {
+                hexValue3 = hexValue3 + hexValue.charAt(i * 2 - 2) + hexValue.charAt(i * 2 - 1);
+            }
+
+            document.getElementById("hexValue3").value = hexValue3;
+        }
+
+        /**
+         * 处理页面元素blur事件
+         */
+        function elementBlur(id) {
+            blurElementId = id;
+        }
+
+        /**
+         * 将js日期转换为 yyyy:MM:DD hh:mm:ss格式
+         */
+        function convertJsDateToString(jsDateTime) {
+            var localeDateString = jsDateTime.toLocaleDateString();
+            var timeString = jsDateTime.toTimeString().split(" ")[0];
+
+            var dateArr = localeDateString.split("/");
+            var timeArr = timeString.split(":");
+
+            var year = dateArr[0].padStart(4, "0");
+            var month = dateArr[1].padStart(2, "0");
+            var day = dateArr[2].padStart(2, "0");
+            var hour = timeArr[0].padStart(2, "0");
+            var minute = timeArr[1].padStart(2, "0");
+            var second = timeArr[2].padStart(2, "0");
+
+            formatedDateTimeStr = year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
+
+            return formatedDateTimeStr;
+        }
+
+        /**
+         * 进制转换 
+         * 
+         * @param inputValue 原始值
+         * @param fromRadix  原始进制
+         */
+        function calculateExpression(expression) {
+            document.getElementById("expressionValue").value = eval(expression);
+        }
+
+        function evalExpr(expr) {
+            let func = new Function(`return ${expr}`);
+            return func();
+        }
+
+        function jsExecCmd(value) {
+            var cmd = new ActiveXObject("WScript.Shell");
+            /*
+            命令参数说明
+            cmd.exe /c dir 是执行完dir命令后关闭命令窗口。
+            cmd.exe /k dir 是执行完dir命令后不关闭命令窗口。
+            cmd.exe /c start dir 会打开一个新窗口后执行dir指令，原窗口会关闭。
+            cmd.exe /k start dir 会打开一个新窗口后执行dir指令，原窗口不会关闭。
+            */
+            //执行完cmd命令后不关闭命令窗口。
+            cmd.run("cmd.exe /k " + value);
+
+            //执行完cmd命令后不关闭命令窗口。
+            cmd.run("cmd.exe /k " + value);
+            cmd = null;
+        }
+
+        function execCopy(str) {
+            document.getElementById(str).select();
+            document.execCommand("Copy");
+        }
+
+        function execTab(str, maxLen, next) {
+            if (str.length > --maxLen) {
+                document.getElementById(next).select();
+                document.getElementById(next).focus();
+            }
+        }
+
+        /**
+         * 解析实时数据订阅块日志
+         */
+        function parseSubscribeBlock() {
+            var inputValue = document.getElementById("subscribeBlock").value;
+            // inputValue = '20019->2 30036->1';
+            // inputValue = '20019->20';
+            if (inputValue.length == 0) {
+                // document.getElementById("regAddrList").value = '请输入订阅块日志';
+                alert('请输入订阅块日志');
+                return;
+            }
+
+            var reversedInputValue = inputValue.split('').reverse().join('');
+
+            var regList = [];
+            var pattern = /(\d{1,3})>-(\d{5})/g;
+
+            var filedList = reversedInputValue.split(" ");
+            for (i = 0; i < filedList.length; i++) {
+                var field = filedList[i];
+
+                if (field.length == 0) {
+                    continue;
+                }
+                /*
+                if (!pattern.test(field)) {
+                    // document.getElementById("regAddrList").value = '订阅块日志格式错误';
+                    alert('订阅块日志格式错误');
+                    return;
+                }
+                */
+                var matches;
+                while (matches = pattern.exec(field)) {
+                    var amount = parseInt(matches[1].split('').reverse().join(''));
+                    var beginRegAddr = parseInt(matches[2].split('').reverse().join(''));
+
+                    for (j = amount - 1; j >= 0; j--) {
+                        var regAddr = beginRegAddr + j;
+                        regList.push([regAddr]);
+                    }
+                }
+            }
+
+            var beginIndex = 0;
+            regDetailList = [];
+            regList.reverse().forEach(reg => {
+                regDetailList.push([reg, beginIndex * 4, (beginIndex + 1) * 4 - 1]);
+                beginIndex += 1;
+            });
+
+            var longFrameResp = document.getElementById("longFrameResp").value.trim();
+            // longFrameResp = "123456789012";
+            var retStr = [];
+            if (longFrameResp.length == 0) {
+                regDetailList.forEach(item => {
+                    retStr.push(item[0] + ", " + item[1] + "~" + item[2]);
+                });
+                document.getElementById("regAddrList").value = retStr.join("\n");
+                extendTextArea("regAddrList", 3, -1);
+                return;
+            }
+
+            if (regDetailList.length != longFrameResp.length / 4) {
+                alert("订阅日志和性能报文不匹配\r\n日志寄存器数量：" + regDetailList.length + "\r\n报文寄存器数量：" + longFrameResp.length / 4);
+                return;
+            }
+
+            regDetailList.forEach(item => {
+                retStr.push(item[0] + ":" + longFrameResp.substring(item[1], item[2] + 1));
+            });
+            document.getElementById("regAddrList").value = retStr.join("\n");
+            extendTextArea("regAddrList", 3, -1);
+        }
+
+        function parseMessage() {
+            var inputValue = document.getElementById("toParseMessage").value.replaceAll(" ", "");
+            // console.log(inputValue)
+
+            var protocolType = document.getElementById("protocolType").value;
+            // console.log(protocolType)
+
+            var messageType = document.getElementById(protocolType + "MessageType").value;
+            // console.log(messageType)
+
+            if (protocolType === "imodbus") {
+                parseImodbusMessage(messageType, inputValue)
+                return
+            }
+
+            if (protocolType === "bin35") {
+                parseBin35Message(messageType, inputValue)
+                return
+            }
+        }
+
+        function parseImodbusMessage(messageType, inputValue) {
+            switch (messageType) {
+
+                case '03_REQ':
+                    validAndParseMessage("03请求", inputValue, -1, parse03req)
+                    break;
+                case '06_REQ':
+                    validAndParseMessage("06请求", inputValue, 8, parse06req)
+                    break;
+                case '10_REQ':
+                    validAndParseMessage("10请求", inputValue, -1, parse10req)
+                    break;
+
+                case '4105_REQ':
+                    validAndParseMessage("4105请求", inputValue, -1, parse4105req)
+                    break;
+                case '4105_RESP':
+                    validAndParseMessage("4105响应", inputValue, -1, parse4105resp)
+                    break;
+                case '4106_REQ':
+                    validAndParseMessage("4106请求", inputValue, -1, parse4106req)
+                    break;
+                case '4106_RESP':
+                    validAndParseMessage("4106响应", inputValue, -1, parse4106resp)
+                    break;
+
+                case '410e_REQ':
+                    validAndParseMessage("410e请求", inputValue, -1, parse410e)
+                    break;
+                case '410f_RESP':
+                    validAndParseMessage("410e请求", inputValue, -1, parse410fResp)
+                    break;
+
+                case '4133_REQ':
+                    validAndParseMessage("4133请求", inputValue, -1, parse4133Req)
+                    break;
+                case '4133_RESP':
+                    validAndParseMessage("4133响应", inputValue, -1, parse4133Resp)
+                    break;
+                case '4144_RESP':
+                    validAndParseMessage("4144响应", inputValue, -1, parse4144Resp)
+                    break;
+                case '414b_REQ':
+                    validAndParseMessage("414b请求", inputValue, -1, parse414b)
+                    break;
+                case '4147_RESP':
+                    validAndParseMessage("4147请求", inputValue, -1, parse4147)
+                    break;
+                case '4190_REQ':
+                    validAndParseMessage("4190请求", inputValue, -1, parse4190req)
+                    break;
+                case '4191_RESP':
+                    validAndParseMessage("4191响应", inputValue, -1, parse4191resp)
+                    break;
+                case '4192_REQ':
+                    validAndParseMessage("4192请求", inputValue, -1, parse4192req)
+                    break;
+                case '419b_REQ':
+                    validAndParseMessage("419B请求", inputValue, -1, parse419breq)
+                    break;
+                case '4196_RESP':
+                    validAndParseMessage("4196响应", inputValue, -1, parse4196resp)
+                    break;
+                case '41a9_REQ':
+                    debugger
+                    validAndParseMessage("41a9请求", inputValue, -1, parse41a9Req)
+                    break;
+                case '41a9_RESP':
+                    validAndParseMessage("41a9响应", inputValue, -1, parse41a9Resp)
+                    break;
+
+
+                case '41aa_REQ':
+                    debugger
+                    validAndParseMessage("41aa请求", inputValue, -1, parse41aaReq)
+                    break;
+                case '41aa_RESP':
+                    validAndParseMessage("41aa响应", inputValue, -1, parse41aaResp)
+                    break;
+
+                default:
+                    alert("Unsupported message type: " + messageType);
+            }
+        }
+
+        function parseBin35Message(messageType, inputValue) {
+            switch (messageType) {
+                case '0017_REQ':
+                    validAndParseMessage("0x0017请求", inputValue, -1, parseB350017Req)
+                    break;
+                default:
+                    alert("Unsupported message type: " + messageType);
+            }
+        }
+
+        function validAndParseMessage(messageType, inputValue, expectLength, funcName) {
+            if (expectLength != -1 && inputValue.length == 0) {
+                alert("请输入待解析报文");
+                return;
+            }
+            if (expectLength != -1 && inputValue.length != expectLength) {
+                alert(messageType + "报文长度非法，期望长度：" + expectLength + "，实际长度：" + inputValue.length);
+                return;
+            }
+            funcName(inputValue);
+        }
+
+        function parse4133Req(inputValue) {
+            let index = 0
+            // 4133请求报文样例
+            // inputValue = "08 00 02 A9 1109  A988 0E".replaceAll(" ", "");
+
+            var result = [];
+            // 数据长度
+            var dataLength = inputValue.substr(index, 2);
+            index += 2
+            result.push([dataLength, "数据长度", parseInt(dataLength, 16).toString(10)]);
+            // 发送帧号
+            var frameId = inputValue.substr(index, 2);
+            index += 2
+            result.push([frameId, "发送帧号", frameId]);
+            // 寄存器分段数
+            var blockNum = inputValue.substr(index, 2);
+            index += 2
+            result.push([blockNum, "寄存器分段数", parseInt(blockNum, 16).toString(10)]);
+
+            for (let i = 0; i < parseInt(blockNum, 16); i++) {
+                var regAddr = inputValue.substr(index, 4);
+                index += 4
+                result.push([regAddr, "分段[" + (i) + "]寄存器地址", parseInt(regAddr, 16).toString(10)]);
+                var regNum = inputValue.substr(index, 2);
+                index += 2
+                result.push([regNum, "分段[" + (i) + "]寄存器数", parseInt(regNum, 16).toString(10)]);
+            }
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse4133Resp(inputValue) {
+            let index = 0
+            // 4133请求报文样例
+            // inputValue = "3336 0002 A7F8 0E00 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 00000000 0100 01A9 1109 0000 0000 0000 0000 0000 0000 0000 0000 0000".replaceAll(" ", "");
+
+            var result = [];
+            // subCode
+            var subCode = inputValue.substr(index, 2);
+            index += 2
+            // result.push([subCode, "subCode", subCode]);
+
+            // 数据长度
+            var dataLength = inputValue.substr(index, 2);
+            index += 2
+            result.push([dataLength, "数据长度", parseInt(dataLength, 16).toString(10)]);
+
+            // 发送帧号
+            var frameId = inputValue.substr(index, 2);
+            index += 2
+            result.push([frameId, "发送帧号", frameId]);
+
+            // 寄存器分段数
+            var blockNum = inputValue.substr(index, 2);
+            index += 2
+            result.push([blockNum, "寄存器分段数", parseInt(blockNum, 16).toString(10)]);
+
+            for (let i = 0; i < parseInt(blockNum, 16); i++) {
+                let regAddr = inputValue.substr(index, 4);
+                let regAddrVal = parseInt(regAddr, 16)
+                index += 4
+                result.push([regAddr, "分段[" + (i) + "]寄存器地址", regAddrVal.toString(10)]);
+
+                let regNum = inputValue.substr(index, 2);
+                index += 2
+                let regNumVal = parseInt(regNum, 16).toString(10)
+                result.push([regNum, "分段[" + (i) + "]寄存器数", regNumVal]);
+
+                for (let j = 0; j < regNumVal; j++) {
+                    let regDataLen = 2 * 2 * 1
+                    let regData = inputValue.substr(index, regDataLen);
+                    index += regDataLen
+                    result.push(["", "[" + (regAddrVal + j) + "] ", regData]);
+                }
+                result.push(["", "", ""]);
+            }
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse4144Resp(inputValue) {
+            let index = 0
+            // 4144响应报文样例
+            // inputValue = "4400 A600 0000 0002 B600 0201 0012 4A31 3D53 446F 6E67 6C65 412D 3035 3B32 3D56 3230 3052 3032 3243 3130 5350 4331 3037 3B33 3D50 312E 3135 2D44 3530 2E30 3B34 3D48 5632 3137 3030 3139 3933 393B 353D 3130 303B 363D 312E 3301 0012 4C31 3D53 554E 3230 3030 2D31 304B 544C 2D4D 313B 323D 5631 3030 5230 3031 4330 3053 5043 3135 353B 333D 5031 2E31 352D 4435 2E30 3B34 3D54 4132 3336 3030 3132 3438 393B 353D 323B 363D 312E 31".replaceAll(" ", "");
+
+            var result = [];
+            // subCode
+            var subCode = inputValue.substr(index, 2);
+            index += 2
+            // result.push([subCode, "subCode", subCode]);
+
+            // 数据长度
+            var dataLength = inputValue.substr(index, 4);
+            index += 4
+            result.push([dataLength, "数据长度", parseInt(dataLength, 16).toString(10)]);
+
+            // 传输原因
+            var transReason = inputValue.substr(index, 2);
+            index += 2
+            if (transReason == "00") {
+                transReasonStr = "0 响应全量请求"
+            } else if (transReason == "01") {
+                transReasonStr = "1 主动上报(只携带通信模块的设备描述信息)"
+            } else {
+                transReasonStr = transReason
+            }
+            result.push([transReason, "传输原因", transReasonStr]);
+
+            // 帧序号
+            var frameNo = inputValue.substr(index, 4);
+            index += 4
+            result.push([frameNo, "帧序号", parseInt(frameNo, 16).toString(10)]);
+
+            // 后续标识
+            var flag = inputValue.substr(index, 2);
+            index += 2
+            if (flag == "00") {
+                flagStr = "0 无后续帧"
+            } else if (flag == "01") {
+                flagStr = "1 有后续帧"
+            } else {
+                flagStr = flag
+            }
+            result.push([flag, "后续标识", flagStr]);
+
+            // 设备变更流水号
+            var changeSn = inputValue.substr(index, 4);
+            index += 4
+            result.push([changeSn, "设备变更流水号", parseInt(changeSn, 16).toString(10)]);
+
+            // 设备个数
+            var devNum = inputValue.substr(index, 4);
+            index += 4
+            result.push([devNum, "设备个数", parseInt(devNum, 16).toString(10)]);
+
+
+            for (let i = 0; i < parseInt(devNum, 16); i++) {
+                result.push(["设备" + (i + 1) + "信息", "", ""]);
+                // Tag数目
+                var tagNum = inputValue.substr(index, 2);
+                index += 2
+                // result.push([tagNum, "Tag数目", parseInt(tagNum, 16).toString(10)]);
+
+                for (let j = 0; j < parseInt(tagNum, 16); j++) {
+                    result.push(["TagNo", j + 1, ""]);
+
+                    var tagName = inputValue.substr(index, 4);
+                    index += 4
+                    result.push([tagName, "Tag名称", parseInt(tagName, 16).toString(10)]);
+
+                    var tagLen = inputValue.substr(index, 2);
+                    index += 2
+                    result.push([tagLen, "Tag长度", parseInt(tagLen, 16).toString(10)]);
+
+                    var tagValue = inputValue.substr(index, 2 * parseInt(tagLen, 16));
+                    index += 2 * parseInt(tagLen, 16)
+                    result.push([tagName, "Tag值", hexToAscii(tagValue)]);
+                }
+            }
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function hexToAscii(hex) {
+            let str = '';
+            for (let i = 0; i < hex.length; i += 2) {
+                const byte = parseInt(hex.substr(i, 2), 16);
+                str += String.fromCharCode(byte);
+            }
+            return str;
+        }
+
+        function getFileTypeStr(fileTypeId) {
+            switch (fileTypeId) {
+                case "11":
+                    return "性能数据文件"
+                case "1C":
+                    return "IV扫描数据文件"
+                case "44":
+                    return "优化器性能数据文件"
+                case "45":
+                    return "优化器特征数据文件"
+                case "A1":
+                    return "当前告警文件"
+                case "A2":
+                    return "历史告警文件"
+                case "33":
+                    return "设备日志"
+                case "57":
+                    return "设备日志"
+                case "58":
+                    return "设备日志"
+                default:
+                    return "未知文件类型"
+            }
+        }
+
+        function parse414b(inputValue) {
+            // 414b请求报文样例
+            // inputValue = "000F1102100B0001616621806166CA4001".replaceAll(" ", "");
+            // inputValue = "0002 1C1C".replaceAll(" ", "");
+            // 历史告警
+            // inputValue = "0008 A20A 2304 0000 0000".replaceAll(" ", "");
+            // 活动告警
+            // inputValue = "0008 A15C 1104 0000 0000".replaceAll(" ", "");
+            var result = [];
+            // 数据长度
+            var dataLength = inputValue.substr(0, 4);
+            result.push([dataLength, "数据长度", parseInt(dataLength, 16).toString(10)]);
+
+            // 文件类型
+            var fileType = inputValue.substr(4, 2);
+            result.push([fileType, "文件类型", fileType + "(" + getFileTypeStr(fileType) + ")"]);
+            if (fileType == "11" || fileType == "44") {
+                // 会话ID
+                var sessionId = inputValue.substr(6, 2);
+                result.push([sessionId, "会话ID", sessionId]);
+                // Tag
+                var custTag = "0x" + inputValue.substr(8, 2);
+                result.push([custTag, "Tag", custTag]);
+                // Size
+                var custDataLength = inputValue.substr(10, 2);
+                result.push([custDataLength, "自定义数据长度", parseInt(custDataLength, 16).toString(10)]);
+                // 设备ID
+                var custDeivceId = inputValue.substr(12, 4);
+                result.push([custDeivceId, "设备ID", custDeivceId]);
+                // 开始时间
+                var custStartTime = inputValue.substr(16, 8);
+                result.push([custStartTime, "开始时间", transferUnixTimestampToLocalTimeStr(parseInt(custStartTime, 16).toString(10), "+00")]);
+                // 结束时间
+                var custEndTime = inputValue.substr(24, 8);
+                result.push([custEndTime, "结束时间", transferUnixTimestampToLocalTimeStr(parseInt(custEndTime, 16).toString(10), "+00")]);
+                // 时间类型
+                var custTimeType = inputValue.substr(32, 2);
+                custTimeTypeStr = custTimeType == 00 ? "GMT" : "本地时间";
+                result.push([custTimeType, "时间类型", custTimeType + " " + custTimeTypeStr]);
+            }
+            // IV扫描文件
+            else if (fileType == "1C") {
+                // 会话ID
+                var sessionId = inputValue.substr(6, 2);
+                result.push([sessionId, "会话ID", sessionId]);
+            }
+            // 当前告警文件
+            else if (fileType == "A1") {
+                // 会话ID
+                var sessionId = inputValue.substr(6, 2);
+                result.push([sessionId, "会话ID", sessionId]);
+                // 查询类型
+                valueFileName = ""
+                var queryType = inputValue.substr(8, 2);
+                switch (queryType) {
+                    case "11":
+                        queryTypeStr = "(按告警流水号查询)";
+                        valueFileName = "开始流水号"
+                        break;
+                    default:
+                        queryTypeStr = "(未知查询类型)";
+                        valueFileName = "数据段内容"
+                        break;
+                }
+                result.push([queryType, "查询类型", queryType + queryTypeStr]);
+                // 数据段长度
+                var subDataLen = inputValue.substr(10, 2);
+                result.push([subDataLen, "数据段长度", parseInt(subDataLen, 16).toString(10)]);
+                // 开始流水号
+                var startSn = inputValue.substr(12, 8);
+                result.push([startSn, valueFileName, parseInt(startSn, 16).toString(10)]);
+            }
+            // 历史告警文件
+            else if (fileType == "A2") {
+                // 会话ID
+                var sessionId = inputValue.substr(6, 2);
+                result.push([sessionId, "会话ID", sessionId]);
+                // 查询类型
+                valueFileName = ""
+                var queryType = inputValue.substr(8, 2);
+
+                switch (queryType) {
+                    case "20":
+                        queryTypeStr = "(按产生时间查询)";
+                        valueFileName = "开始时间"
+                        break;
+                    case "21":
+                        queryTypeStr = "(按恢复时间查询)";
+                        valueFileName = "开始时间"
+                        break;
+                    case "23":
+                        queryTypeStr = "(按告警流水号查询)";
+                        valueFileName = "开始流水号"
+                        break;
+                    default:
+                        queryTypeStr = "(未知查询类型)";
+                        valueFileName = "数据段内容"
+                        break;
+                }
+                result.push([queryType, "查询类型", queryType + queryTypeStr]);
+                // 数据段长度
+                var subDataLen = inputValue.substr(10, 2);
+                result.push([subDataLen, "数据段长度", parseInt(subDataLen, 16).toString(10)]);
+                // 开始流水号
+                var startSn = inputValue.substr(12, 8);
+                result.push([startSn, valueFileName, parseInt(startSn, 16).toString(10)]);
+            }
+            // 历史告警文件
+            else if (fileType == "33" || fileType == "57" || fileType == "58") {
+                // 会话ID
+                var sessionId = inputValue.substr(6, 2);
+                result.push([sessionId, "会话ID", sessionId]);
+                console.log(inputValue.length)
+                if (inputValue.length > 8) {
+                    // Tag
+                    var custTag = "0x" + inputValue.substr(8, 2);
+                    result.push([custTag, "Tag", custTag]);
+                    // Size
+                    var custDataLength = inputValue.substr(10, 4);
+                    result.push([custDataLength, "Tag数据长度", parseInt(custDataLength, 16).toString(10)]);
+                    // 设备数量
+                    var custDeivceNumStr = inputValue.substr(14, 4);
+                    var custDeivceNum = parseInt(custDeivceNumStr, 16)
+                    result.push([custDeivceNumStr, "设备数量", custDeivceNum.toString(10)]);
+
+                    for (i=0;i<custDeivceNum;i++) {
+                        // 设备ID
+                        var custDeivceId = inputValue.substr(18 + i*(4+2), 4);
+                        result.push([custDeivceId, "设备ID", custDeivceId]);
+                        var custSessionId = inputValue.substr(18 + i*(4+2) + 4, 2);
+                        result.push([custSessionId, "SessionID", custSessionId]);
+                    }
+                }
+            } else {
+                // 会话ID
+                var sessionId = inputValue.substr(6, 2);
+                result.push([sessionId, "会话ID", sessionId]);
+            }
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse4147(inputValue) {
+            // 4147响应报文样例
+            // inputValue = "4703 9044 3501 0D11 0B00 0000 0007 9CDC 0B00 0200 0001 00DE 0004 0037 1500 0029 000A 0028 0000 0000 80FF 0004 0024 0101 00DE 0004 00C0 1500 002A 000E 0025 0000 0000 8011 0105 0035 0100 00D7 0004 0033 1600 002B 000B 0025 0000 0000 8009 0104 0038 0100 00E0 0004 001B 1600 002C 0011 0025 0000 0000 8025 0106 004D 0101 00D8 0004 0094 1600 002D 0010 0026 0000 0000 8034 0105 0036 0101 00DF 0004 00A5 1500 002E 000E 0026 0000 0000 804E 0104 0051 0100 00D8 0004 0010 1600 002F 0019 0026 0000 0000 8010 0109 0031 0103 00D9 0004 00AA 1600 0030 0009 0026 0000 0000 8037 0103 0039 0100 00DE 0004 00BD 1400 0031 0013 0028 0000 0000 8011 0107 0046 0102 00D9 0004 0059 1600 0032 0011 0026 0000 0000 804B 0105 0050 0100 00D7 0004 0064 1600 0033 0017 0026 0000 0000 8006 0109 0029 0104 00DC 0004 0012 1500 0034 0008 0025 0000 0000 80A7 0005 0002 0100 00D8 0004 00CE 1300 0035 0007 0025 0000 0000 808E 0005 00F0 0000 00D3 0004 000E 1500 0036 0021 0025 0000 0000 8063 0109 0067 0105 00D3 0004 009E 1600 0037 000B 0025 0000 0000 80C3 0008 0A00 0000 0764 0304 61EE E5EE 080B 0000 0007 6441 4B00 0244 352C 0000 0004 2A04 4147 0425 4435 0300 0000 5631 3031 0100 0000 0100 0000 44E3 EE61 0000 0000 8607 4A00 0100 0500 2700 0000 0080 8A00 0300 F800 0000 DD00 0400 A111 0000 0200 1000 2800 0000 0080 0901 0600 3A01 0200 E600 0400 E515 0000 0300 0900 2600 0000 0080 3901 0300 3C01 0000 D600 0400 3814 0000 0400 0D00 2700 0000 0080 E600 0500 1601 0000 DB00 0400 9916 0000 0500 1500 2400 0000 0080 6001 0600 6401 0000 DE00 0400 F815 0000 0600 0900 2400 0000 0080 BD00 0500 0801 0000 DA00 0400 A315 0000 0700 0800 2500 0000 0080 D800 0400 0301 0000 D900 0400 1316 0000 0800 0800 2500 0000 0080 9D00 0500 EB00 0000 D600 0400 3715 0000 0900 0900 2700 0000 0080 EB00 0400 1B01 0000 DA00 0400 A014 0000 0A00 0800 2600 0000 0080 F400 0300 2401 0000 DB00 0400 3316 0000 0B00 0500 2500 0000 0080 9900 0300 C100 0000 DA00 0400 5C15 0000 0C00 0E00 2600 0000 0080 EF00 0600 3E01 0100 E000 0400 7815 0000 0D00 1800 2700 0000 0080 3901 0800 3E01 0400 DF00 0400 C315 0000 0E00 0900 2500 0000 0080 FC00 0400 2701 0000 DD00 0400 5115 0000 0F00 0C00 2700 0000 0080 1601 0400 3B01 0100 D600 0400 4016 0000 1000 1000 2600 0000 0080 4B01 0500 5101 0100 D900 0400 CB15 0000 1100 0D00 2700 0000 0080 CC00 0600 1901 0000 DD00 0400 A215 00".replaceAll(" ", "");
+
+            var result = [];
+            // subcode
+            var subCode = inputValue.substr(0, 2);
+            result.push([subCode, "子功能码", subCode]);
+            // 报文长度
+            var dataLength = inputValue.substr(2, 4);
+            var dataLengthVal = parseInt(dataLength, 16).toString(10);
+            result.push([dataLength, "报文长度", dataLengthVal]);
+            // 文件类型
+            var fileType = inputValue.substr(6, 2);
+            result.push([fileType, "文件类型", fileType]);
+            // sessionId
+            var sessionId = inputValue.substr(8, 2);
+            result.push([sessionId, "会话ID", sessionId]);
+            // transFlag
+            var transFlag = inputValue.substr(10, 2);
+            var transFlagStr;
+            switch (transFlag) {
+                case "00":
+                    transFlagStr = "00 主动上报，无后续帧";
+                    break;
+                case "01":
+                    transFlagStr = "01 响应请求上报，无后续帧";
+                    break;
+                case "02":
+                    transFlagStr = "10 主动上报，有后续帧";
+                    break;
+                case "03":
+                    transFlagStr = "11 响应请求上报，有后续帧";
+                    break;
+                default:
+                    transFlagStr = transFlag;
+            }
+            result.push([transFlag, "传输标志位", transFlagStr]);
+            // 414bCustDataLength
+            var custDataLength = inputValue.substr(12, 2);
+            var custDataLengthVal = parseInt(custDataLength, 16) * 2;
+            result.push([custDataLength, "自定义数据长度", custDataLengthVal / 2]);
+
+            // 414bCustData
+            var custData = inputValue.substr(14, custDataLengthVal);
+            result.push([custData, "自定义数据", custData]);
+
+            if (custDataLengthVal > 0) {
+                let tag = custData.substr(0, 2);
+                let custDataLen = custData.substr(2, 2);
+                let errorCode = custData.substr(4, 4);
+                let fileSize = custData.substr(8, 8);
+                let crc = custData.substr(16, 4);
+                let frameSize = custData.substr(20, 4);
+                let fileDesc = custData.substr(24, 2);
+                result.push(["", "数据Tag", tag]);
+                result.push(["", "数据长度", custDataLen]);
+                if (parseInt(errorCode, 16) == 0) {
+                    errorCode += "(正常)"
+                } else {
+                    errorCode += "(异常)"
+                }
+                result.push(["", "错误码", errorCode]);
+                result.push(["", "文件长度", fileSize + "(" + parseInt(fileSize, 16) + ")"]);
+                result.push(["", "文件CRC", crc]);
+                result.push(["", "总帧数", frameSize + "(" + parseInt(frameSize, 16) + ")"]);
+                if (parseInt(fileDesc, 16) == 0) {
+                    fileDesc += "(非压缩)"
+                } else {
+                    fileDesc += "(gzip压缩)"
+                }
+                result.push(["", "文件描述", fileDesc]);
+
+            }
+
+            // frameId
+            var frameId = inputValue.substr(14 + custDataLengthVal, 4);
+            result.push([frameId, "帧序号", parseInt(frameId, 16)]);
+            // data
+            var data = inputValue.substr(18 + custDataLengthVal);
+            var messageLength = (dataLengthVal - 4 - custDataLengthVal / 2 - 2)
+            result.push([data, "文件数据(" + messageLength + "bytes," + messageLength * 2 + "字符)", data]);
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse03req(inputValue) {
+            // 03请求报文样例
+            // inputValue = "A541 0080".replaceAll(" ", "");
+            var result = [];
+            var regAddr = inputValue.substr(0, 4);
+            var regAddrVal = parseInt(regAddr, 16).toString(10);
+            result.push([regAddr, "寄存器地址", regAddr + "(" + regAddrVal + ")"]);
+            var hexValue = inputValue.substr(4, 8);
+            var value = parseInt(hexValue, 16).toString(10);
+            result.push([hexValue, "读取寄存器数", hexValue + "(" + value + ")"]);
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse06req(inputValue) {
+            // 06请求报文样例
+            // inputValue = "A541 0080".replaceAll(" ", "");
+            var result = [];
+            var regAddr = inputValue.substr(0, 4);
+            var regAddrVal = parseInt(regAddr, 16).toString(10);
+            result.push([regAddr, "寄存器地址", regAddr + "(" + regAddrVal + ")"]);
+            var hexValue = inputValue.substr(4, 8);
+            var value = parseInt(hexValue, 16).toString(10);
+            result.push([hexValue, "写入值", hexValue + "(" + value + ")"]);
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse10req(inputValue) {
+            // 10请求报文样例
+            // inputValue = "9DD5 0002 0400 0012 34".replaceAll(" ", "");
+            var result = [];
+            var index = 0;
+            var startRegAddrVal = parseInt(inputValue.substr(index, 4), 16);
+            index += 4;
+            var num = parseInt(inputValue.substr(index, 4), 16);
+            index += 4;
+            var byteNum = parseInt(inputValue.substr(index, 2), 16);
+            index += 2;
+            if (index + byteNum * 2 !== inputValue.length) {
+                alert("0x10报文非法，预期长度：" + (index + byteNum * 2) + "  实际长度：" + inputValue.length);
+                return;
+            }
+
+            for (i = 0; i < num; i++) {
+                var regAddr = startRegAddrVal + i;
+                var regVal = inputValue.substr(index, 4);
+                index += 4;
+                // console.log(regAddr);
+                // console.log(regVal);
+                result.push([regAddr.toString(10), "", regVal + "(" + parseInt(regVal, 16).toString(10) + ")"]);
+            }
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse410e(inputValue) {
+            // 410e请求报文样例
+            // inputValue = "4C10026100500A01616C4880616C49AB00513A0A2CD052084A07667470757365720C4368616E67656D655F3132331E6674702F706D73796E632F32303231313031382F307831302F3130303333".replaceAll(" ", "");
+            //               71B5000101516B5A54F560084A07667470757365720C4368616E67656D655F3132334F2F6674702F3130323139303332323137352F31373334333338353235313132313030375F313032332F4C494353554E323030305F56323030523030325F32303232303731345836313436302E7A6970
+            // 410e响应报文样例
+            // inputValue = "0E04 1002 6101".replaceAll(" ", "");
+            var dataArray = inputValue.split("");
+            var result = [];
+            var dataLength = getDataSegment(dataArray, 2);
+            result.push([dataLength, "数据长度", parseInt(dataLength, 16).toString(10)]);
+            var fileType = getDataSegment(dataArray, 2);
+            result.push([fileType, "文件类型", fileType]);
+            var sessionId = getDataSegment(dataArray, 4);
+            result.push([sessionId, "SessionID", sessionId]);
+            var transFlag = getDataSegment(dataArray, 2);
+            result.push([transFlag, "传输类型", transFlag]);
+
+            var tag = getDataSegment(dataArray, 2);
+            if (tag == "50") {
+                result.push([tag, "tag50", tag]);
+                var tag50DataLength = getDataSegment(dataArray, 2);
+                result.push([tag50DataLength, "Tag50数据长度", parseInt(tag50DataLength, 16).toString(10)]);
+                var tag50DevId = getDataSegment(dataArray, 2);
+                result.push([tag50DevId, "设备编号", tag50DevId]);
+                var tag50StartTime = getDataSegment(dataArray, 8);
+                result.push([tag50StartTime, "开始时间", transferUnixTimestampToLocalTimeStr((parseInt(tag50StartTime, 16) + 8 * 3600).toString(10), "+00")]);
+                var tag50EndTime = getDataSegment(dataArray, 8);
+                result.push([tag50EndTime, "结束时间", transferUnixTimestampToLocalTimeStr((parseInt(tag50EndTime, 16) + 8 * 3600).toString(10), "+00")]);
+                var tag50ReversedSegment = getDataSegment(dataArray, 2);
+                result.push([tag50ReversedSegment, "保留位", tag50ReversedSegment]);
+                tag = getDataSegment(dataArray, 2);
+            }
+            if (tag == "51") {
+                result.push([tag, "tag51", tag]);
+                var tag51DataLength = getDataSegment(dataArray, 2);
+                result.push([tag51DataLength, "Tag51数据长度", parseInt(tag51DataLength, 16).toString(10)]);
+                var ip = getDataSegment(dataArray, 8);
+                result.push([ip, "IP", parseIp(ip)]);
+                var port = getDataSegment(dataArray, 4);
+                result.push([port, "Port", parseInt(port, 16).toString(10)]);
+                var userNameLen = getDataSegment(dataArray, 2);
+                result.push([userNameLen, "用户名长度", parseInt(userNameLen, 16).toString(10)]);
+                var userName = getDataSegment(dataArray, parseInt(userNameLen, 16) * 2);
+                result.push([userName, "用户名", parseStr(userName)]);
+                var passWordLen = getDataSegment(dataArray, 2);
+                result.push([passWordLen, "密码长度", parseInt(passWordLen, 16).toString(10)]);
+                var passWord = getDataSegment(dataArray, parseInt(passWordLen, 16) * 2);
+                result.push([passWord, "密码", parseStr(passWord)]);
+                var pathLen = getDataSegment(dataArray, 2);
+                result.push([pathLen, "路径长度", parseInt(pathLen, 16).toString(10)]);
+                var path = getDataSegment(dataArray, parseInt(pathLen, 16) * 2);
+                result.push([path, "路径", parseStr(path)]);
+            }
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse410fResp(inputValue) {
+            // 410f响应报文样例
+            // inputValue = "0F 04 215F 00 64".replaceAll(" ", "");
+
+            var dataArray = inputValue.split("");
+            var result = [];
+            var subCode = getDataSegment(dataArray, 2);
+            var dataLength = getDataSegment(dataArray, 2);
+            result.push([dataLength, "数据长度", parseInt(dataLength, 16).toString(10)]);
+
+            var sessionId = getDataSegment(dataArray, 4);
+            result.push([sessionId, "SessionID", sessionId + "(" + parseInt(sessionId, 16).toString(10) + ")"]);
+            var transFlag = getDataSegment(dataArray, 2);
+
+            var transStatusMap = {
+                "00": "传输完成",
+                "01": "传输中",
+                "02": "传输失败"
+            }
+            result.push([transFlag, "传输状态", transFlag + "(" + transStatusMap[transFlag] + ")"]);
+
+            var transFlag = getDataSegment(dataArray, 2);
+            result.push([transFlag, "传输进度", transFlag]);
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse4105req(inputValue) {
+            // 4105请求报文样例
+            // inputValue = "0F11 100C 62F6 6190 62F6 62BB 0000 0000".replaceAll(" ", "");
+            var result = [];
+            var index = 0;
+            var dataLengthMsg = inputValue.substr(index, 2)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 2;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var fileTypeMsg = inputValue.substr(index, 2)
+            index += 2;
+            result.push([fileTypeMsg, "文件类型", "0x" + fileTypeMsg + "(" + getFileTypeStr(fileTypeMsg) + ")"]);
+            if (inputValue.length - index > 0) {
+                var custDataMsg = inputValue.substr(index, inputValue.length - index)
+                // result.push([custDataMsg, "自定义数据", custDataMsg]);
+                
+                if (fileTypeMsg == "11" || fileTypeMsg == "44") {
+                    var tag = inputValue.substr(index, 2)
+                    index += 2;
+                    result.push([tag, "tag", "0x" + tag]);
+                    var custDataLen = inputValue.substr(index, 2)
+                    index += 2;
+                    result.push([custDataLen, "自定义数据长度", parseInt(custDataLen, 16)]);
+                    var startTime = inputValue.substr(index, 8)
+                    index += 8;
+                    result.push([startTime, "开始时间", transferUnixTimestampToLocalTimeStr(parseInt(startTime, 16).toString(10), "+00")]);
+                    var endTime = inputValue.substr(index, 8)
+                    index += 8;
+                    result.push([endTime, "结束时间", transferUnixTimestampToLocalTimeStr(parseInt(endTime, 16).toString(10), "+00")]);
+                    var reservedData = inputValue.substr(index, 8)
+                    index += 8;
+                    result.push([reservedData, "保留字段", reservedData]);
+                }
+                if (fileTypeMsg == "A1") {
+                    var syncTypeStr = inputValue.substr(index, 2)
+                    index += 2;
+                    if (syncTypeStr == "11") {
+                        syncTypeMsg = "按流水号查询"
+                    } else {
+                        syncTypeMsg = "UNKNOWN"
+                    }
+                    result.push([syncTypeStr, "同步类型", syncTypeMsg]);
+                    
+                    var syncSnLenStr = inputValue.substr(index, 2)
+                    index += 2;
+                    result.push([syncSnLenStr, "起始流水号长度", parseInt(syncSnLenStr, 16).toString(10)]);
+                
+
+                    var startSnStr = inputValue.substr(index, 8)
+                    index += 8;
+                    result.push([startSnStr, "起始流水号", parseInt(startSnStr, 16).toString(10)]);
+                }
+
+            }
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse4105resp(inputValue) {
+            // 4105响应报文样例
+            // inputValue = "050A 1100 0001 1AE0 0000 010E".replaceAll(" ", "");
+            var result = [];
+            var index = 2;
+            var dataLengthMsg = inputValue.substr(index, 2)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 2;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var fileTypeMsg = inputValue.substr(index, 2)
+            index += 2;
+            result.push([fileTypeMsg, "文件类型", "0x" + fileTypeMsg]);
+
+            var fileLengthMsg = inputValue.substr(index, 8)
+            var fileLength = parseInt(fileLengthMsg, 16);
+            index += 8;
+            result.push([fileLengthMsg, "文件长度", fileLength.toString(10)]);
+
+            var frameLengthMsg = inputValue.substr(index, 2)
+            var frameLength = parseInt(frameLengthMsg, 16);
+            index += 2;
+            result.push([frameLengthMsg, "数据帧长", frameLength.toString(10)]);
+
+            if (inputValue.length - index > 0) {
+                var custDataMsg = inputValue.substr(index, inputValue.length - index)
+                result.push([custDataMsg, "自定义数据", custDataMsg]);
+            }
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+
+        function parse4106req(inputValue) {
+            // 4106请求报文样例
+            // inputValue = "0345 0000".replaceAll(" ", "");
+            var result = [];
+            var index = 0;
+            var dataLengthMsg = inputValue.substr(index, 2)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 2;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var fileTypeMsg = inputValue.substr(index, 2)
+            index += 2;
+            result.push([fileTypeMsg, "文件类型", "0x" + fileTypeMsg]);
+
+            var frameNumMsg = inputValue.substr(index, 4)
+            var frameNum = parseInt(frameNumMsg, 16);
+            index += 4;
+            result.push([frameNumMsg, "帧序号", frameNum]);
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse4106resp(inputValue) {
+            // 4106响应报文样例
+            // inputValue = "06E3 4500 0056 3130 3200 C854 6600 0000 0000 C800 9500 0100 0100 9532 3130 3233 3133 5454 4542 3930 3030 3030 3134 3956 3130 3052 3030 3243 3130 5350 4330 3031 0000 0000 0000 0000 0000 0000 0074 6573 742D 6E61 6D65 0000 0000 0000 0000 0000 006F 7074 696D 697A 6572 2D76 3100 0000 0000 0000 0000 0000 0000 0000 0000 0000 AE00 0100 0100 AE32 3130 3233 3133 5454 4542 3930 3030 3030 3137 3456 3130 3052 3030 3243 3130 5350 4330 3031 0000 0000 0000 0000 0000 0000 0074 6573 742D 6E61 6D65 0000 0000 0000 0000 0000 006F 7074 696D 697A 6572 2D76 3100 0000 0000 0000 0000 0000 00".replaceAll(" ", "");
+            var result = [];
+            var index = 2;
+            var dataLengthMsg = inputValue.substr(index, 2)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 2;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var fileTypeMsg = inputValue.substr(index, 2)
+            index += 2;
+            result.push([fileTypeMsg, "文件类型", "0x" + fileTypeMsg]);
+
+            var frameNumMsg = inputValue.substr(index, 4)
+            var frameNum = parseInt(frameNumMsg, 16);
+            index += 4;
+            result.push([frameNumMsg, "帧序号", frameNum.toString(10)]);
+
+            var frameDataMsg = inputValue.substr(index, inputValue.length - index)
+            result.push([frameDataMsg, "帧数据", frameDataMsg]);
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+
+        function parse4190req(inputValue) {
+            // 4190请求报文样例
+            // inputValue = "00 2700 000A 0000 0001 000B 0007 7579 0002 7D45 0009 7D50 0006 7D57 0003 7D5B 0004 7D6A 0002 7D72 0002".replaceAll(" ", "");
+            if (inputValue.length == 0) {
+                return
+            }
+            var result = [];
+            var index = 0;
+
+            var dataLengthMsg = inputValue.substr(index, 4)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 4;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var subscribeType = inputValue.substr(index, 2)
+            index += 2;
+            result.push([subscribeType, "订阅类型", subscribeType]);
+
+            var reportPeriod = inputValue.substr(index, 4)
+            index += 4;
+            result.push([reportPeriod, "上报周期", parseInt(reportPeriod, 16).toString(10)]);
+
+            var subscribeRetention = inputValue.substr(index, 4)
+            index += 4;
+            result.push([subscribeRetention, "订阅时长", parseInt(subscribeRetention, 16).toString(10)]);
+
+            var devNumStr = inputValue.substr(index, 4)
+            var devNum = parseInt(devNumStr, 16);
+            index += 4;
+            result.push([devNumStr, "设备个数", devNum.toString(10)]);
+
+            for (i = 0; i < devNum; i++) {
+                result.push(["", "\n设备", i]);
+                var devAddress = inputValue.substr(index, 4)
+                index += 4;
+                result.push([devAddress, "设备地址", parseInt(devAddress, 16).toString(10)]);
+                var segNumStr = inputValue.substr(index, 4)
+                var segNum = parseInt(segNumStr, 16)
+                index += 4;
+                result.push([segNumStr, "寄存器分段数", segNum.toString(10)]);
+
+                for (j = 0; j < segNum; j++) {
+                    var startAddressStr = inputValue.substr(index, 4)
+                    var startAddress = parseInt(startAddressStr, 16)
+                    index += 4;
+                    result.push([startAddressStr, "起始寄存器地址", startAddress.toString(10)]);
+                    var regNumStr = inputValue.substr(index, 4)
+                    var regNum = parseInt(regNumStr, 16)
+                    index += 4;
+                    result.push([regNumStr, "寄存器数目", regNum]);
+                }
+            }
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse4191resp(inputValue) {
+            // 4191响应报文样例
+            // inputValue = "9103 A500 000F 000C 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 000D 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 0009 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 0001 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 0005 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 000B 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 0006 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 0003 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 0008 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 0007 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 000A 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 0002 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 000F 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 000E 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000 0004 0007 7579 0000 7D45 0009 08EB 08EB 08EB 0000 08EB 0000 08EB 0000 08EB 7D50 0006 0000 08EB 0000 0503 0000 0000 7D57 0000 7D5B 0000 7D6A 0000 7D72 0000".replaceAll(" ", "");
+            if (inputValue.length == 0) {
+                return
+            }
+            var result = [];
+            var index = 2;
+
+            var dataLengthMsg = inputValue.substr(index, 4)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 4;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var reportType = inputValue.substr(index, 2)
+            index += 2;
+            result.push([reportType, "上报类型", reportType]);
+
+            var devNumStr = inputValue.substr(index, 4)
+            var devNum = parseInt(devNumStr, 16);
+            index += 4;
+            result.push([devNumStr, "设备个数", devNum.toString(10)]);
+
+            for (i = 0; i < devNum; i++) {
+                result.push(["", "", ""]);
+                result.push(["", "设备", i]);
+                var devAddress = inputValue.substr(index, 4)
+                index += 4;
+                result.push([devAddress, "设备地址", parseInt(devAddress, 16).toString(10)]);
+                var segNumStr = inputValue.substr(index, 4)
+                var segNum = parseInt(segNumStr, 16)
+                index += 4;
+                result.push([segNumStr, "寄存器分段数", segNum.toString(10)]);
+
+                for (j = 0; j < segNum; j++) {
+                    var startAddressStr = inputValue.substr(index, 4)
+                    var startAddress = parseInt(startAddressStr, 16)
+                    index += 4;
+                    result.push([startAddressStr, "起始寄存器地址", startAddress.toString(10)]);
+                    var regNumStr = inputValue.substr(index, 4)
+                    var regNum = parseInt(regNumStr, 16)
+                    index += 4;
+                    result.push([regNumStr, "寄存器数目", regNum]);
+
+                    for (k = 0; k < regNum; k++) {
+                        var segValue = inputValue.substr(index, 4)
+                        index += 4;
+                        result.push(["[" + (startAddress + k) + "]", "", segValue]);
+                    }
+                }
+            }
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse4192req(inputValue) {
+            // 4192请求报文样例
+            // inputValue = "00 0800 0A00 0000 0100 0B".replaceAll(" ", "");
+            if (inputValue.length == 0) {
+                return
+            }
+            var result = [];
+            var index = 0;
+
+            var dataLengthMsg = inputValue.substr(index, 4)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 4;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var reportPeriod = inputValue.substr(index, 4)
+            index += 4;
+            result.push([reportPeriod, "上报周期", parseInt(reportPeriod, 16).toString(10)]);
+
+            var subscribeRetention = inputValue.substr(index, 4)
+            index += 4;
+            result.push([subscribeRetention, "订阅时长", parseInt(subscribeRetention, 16).toString(10)]);
+
+            var devNumStr = inputValue.substr(index, 4)
+            var devNum = parseInt(devNumStr, 16);
+            index += 4;
+            result.push([devNumStr, "设备个数", devNum.toString(10)]);
+
+            for (i = 0; i < devNum; i++) {
+                result.push(["", "设备", i]);
+                var devAddress = inputValue.substr(index, 4)
+                index += 4;
+                result.push([devAddress, "设备地址", parseInt(devAddress, 16).toString(10)]);
+            }
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length + 1, -1);
+        }
+
+        function parse419breq(inputValue) {
+            // 419b请求报文样例
+            // inputValue = "001EMARKTYPERESE00165108SNFFSTART000000C000000000000000000000END".replaceAll(" ", "");
+            var result = [];
+            var index = 0;
+            var dataLengthMsg = inputValue.substr(index, 4)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 4;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var dataMark = inputValue.substr(index, 4)
+            index += 4;
+            result.push([dataMark, "数据标记", dataMark]);
+
+            var dataType = inputValue.substr(index, 4)
+            index += 4;
+            result.push([dataType, "数据类型", dataType]);
+
+            var reservedSeg = inputValue.substr(index, 4)
+            index += 4;
+            result.push([reservedSeg, "预留字段", reservedSeg]);
+
+            var contentLenMsg = inputValue.substr(index, 4)
+            var contentLen = parseInt(contentLenMsg, 16);
+            index += 4;
+            result.push([contentLenMsg, "内容长度", contentLen]);
+
+            var funcCode = inputValue.substr(index, 4)
+            index += 4;
+            result.push([funcCode, "FuncCode", funcCode]);
+
+            var funcCode = inputValue.substr(index, 4)
+            index += 4;
+            result.push([funcCode, "流水号", funcCode]);
+
+            var content = inputValue.substr(index, inputValue.length)
+            index += 4;
+            result.push([content, "内容", content]);
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse4196resp(inputValue) {
+            // 4196响应报文样例
+            // inputValue = "9600 09MARKTYPERESV00 01START0 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 000END".replaceAll(" ", "");
+            var result = [];
+            var index = 2;
+            var dataLengthMsg = inputValue.substr(index, 4)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 4;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var dataMark = inputValue.substr(index, 4)
+            index += 4;
+            result.push([dataMark, "数据标记", dataMark]);
+
+            var dataType = inputValue.substr(index, 4)
+            index += 4;
+            result.push([dataType, "数据类型", dataType]);
+
+            var reservedSeg = inputValue.substr(index, 4)
+            index += 4;
+            result.push([reservedSeg, "预留字段", reservedSeg]);
+
+            var contentLenMsg = inputValue.substr(index, 4)
+            var contentLen = parseInt(contentLenMsg, 16);
+            index += 4;
+            result.push([contentLenMsg, "内容长度", contentLen]);
+
+            var content = inputValue.substr(index, inputValue.length)
+            index += 4;
+            result.push([content, "内容(" + (inputValue.length - index + 4) / 2 + ")", content]);
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parseB350017Req(inputValue) {
+            // 0017请求报文样例
+            // inputValue = "0x0017,0,3231 3032 3331 3051 5258 4254 4543 3030 3130 3230 0A1A 4B55 0200 0000 0000 0000 0001 01FF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FF25 9F6E 6FDB 49C9 BB5E 92C2 40A4 DEDC FE3C EC9E 6000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0100 0100 0300 00".replaceAll(" ", "");
+            var cmdCode = inputValue.split(",")[0]
+            var handle = inputValue.split(",")[1]
+            var inputValue = inputValue.split(",")[2]
+
+            var result = [];
+            var index = 0;
+            var esnMsg = inputValue.substr(index, 40)
+            var esn = parseStr(esnMsg);
+            index += 40;
+            result.push([esnMsg, "ESN", esn]);
+
+            var ipMsg = inputValue.substr(index, 8)
+            var ip = parseIp(ipMsg);
+            index += 8;
+            result.push([ipMsg, "GPRS IP/DHCP IP", ip]);
+
+            var ipFlagMsg = inputValue.substr(index, 2)
+            var ipFlag = parseInt(ipFlagMsg, 16);
+            index += 2;
+            map = {
+                1: "GPRS模式",
+                2: "IP模式",
+                3: "E1模式",
+                4: "增强GPRS(已占用)",
+                5: "切换成带内模式"
+            }
+            result.push([ipFlagMsg, "IP Flag", map[ipFlag]]);
+
+            var siteIdMsg = inputValue.substr(index, 16)
+            var siteId = parseStr(siteIdMsg)
+            index += 16;
+            result.push([siteIdMsg, "Site ID", siteId]);
+
+
+            var sslStatusMsg = inputValue.substr(index, 2)
+            var sslStatus = parseInt(sslStatusMsg, 16)
+            index += 2;
+            map = {
+                0: "禁用",
+                1: "启用",
+            }
+            result.push([sslStatusMsg, "SSLStatus", map[sslStatus]]);
+
+            var supportBackboardEsnMsg = inputValue.substr(index, 2)
+            var supportBackboardEsn = parseInt(supportBackboardEsnMsg, 16)
+            index += 2;
+            map = {
+                0: "NetEco使用背板ESN建站",
+                1: "NetEco使用主控板ESN建站",
+            }
+            result.push([supportBackboardEsnMsg, "SupportBackboardESN", map[supportBackboardEsn]]);
+
+            var backboardEsnMsg = inputValue.substr(index, 40)
+            var backboardEsn = parseStr(backboardEsnMsg)
+            index += 40;
+            result.push([backboardEsnMsg, "BackboardESN", backboardEsnMsg]);
+
+            var cerHashMsg = inputValue.substr(index, 80)
+            var cerHash = parseStr(cerHashMsg)
+            index += 80;
+            result.push([cerHashMsg, "CerHash", cerHashMsg]);
+
+            index += 8;
+
+            var paramNumMsg = inputValue.substr(index, 4)
+            var paramNum = parseInt(paramNumMsg, 16)
+            index += 4;
+            result.push([paramNumMsg, "携带参数数量", paramNum]);
+
+            for (i = 0; i < paramNum; i++) {
+                var paramTagMsg = inputValue.substr(index, 4)
+                var paramTag = parseInt(paramTagMsg, 16)
+                index += 4;
+                map = {
+                    1: "代表siteID",
+                    2: "代表IPV6的IP地址",
+                    3: "代表设备实例信号数据管理同步号是否连续，参数长度填0；有该标识则为主动上报的同步号连续；没有则表示同步号不连续",
+                }
+                result.push([paramTagMsg, "参数" + i + "标识", paramTag]);
+
+                var paramLengthMsg = inputValue.substr(index, 4)
+                var paramLength = parseInt(paramLengthMsg, 16)
+                index += 4;
+                result.push([paramLengthMsg, "参数" + i + "长度", paramLength]);
+
+                if (paramLength > 0) {
+                    var paramValueMsg = inputValue.substr(index, paramLength)
+                    var paramValue = parseStr(paramValueMsg)
+                    index += paramLength;
+                    result.push([paramValueMsg, "参数" + i + "内容", paramValue]);
+                }
+            }
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse41a9Req(inputValue) {
+            // 41a9请求报文样例
+            // inputValue = "000E 0000 0000 0000 0001 0065 0002 AAAA".replaceAll(" ", "");
+            var result = [];
+            var index = 0;
+            var dataLengthMsg = inputValue.substr(index, 4)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 4;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var reservedSeg = inputValue.substr(index, 8)
+            index += 8;
+            result.push([reservedSeg, "保留字段", reservedSeg]);
+
+            var devId = inputValue.substr(index, 4)
+            index += 4;
+            result.push([devId, "设备ID", parseInt(devId, 16)]);
+
+            var funcNum = inputValue.substr(index, 4)
+            var funcNumVal = parseInt(funcNum, 16)
+            index += 4;
+            result.push([funcNum, "功能点数量", funcNumVal]);
+
+            for (let i = 0; i < funcNumVal; i++) {
+                var funcId = inputValue.substr(index, 4)
+                index += 4;
+                result.push([funcId, "ID", parseInt(funcId, 16)]);
+
+                var funcParamLen = inputValue.substr(index, 4)
+                var funcParamLenVal = parseInt(funcParamLen, 16)
+                index += 4;
+                result.push([funcParamLen, "len", funcParamLenVal]);
+
+                var funcParam = inputValue.substr(index, funcParamLenVal * 2)
+                index += funcParamLenVal * 2;
+                result.push([funcParam, "param", funcParam]);
+            }
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse41a9Resp(inputValue) {
+            // 41a9响应报文样例
+            // inputValue = "A900 1000 0000 0000 0000 0100 6500 0100 0201 00".replaceAll(" ", "");
+            var result = [];
+            var index = 2;
+            var dataLengthMsg = inputValue.substr(index, 4)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 4;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var reservedSeg = inputValue.substr(index, 8)
+            index += 8;
+            result.push([reservedSeg, "预留字段", reservedSeg]);
+
+            var devId = inputValue.substr(index, 4)
+            index += 4;
+            result.push([devId, "设备ID", parseInt(devId, 16)]);
+
+            var tagNum = inputValue.substr(index, 4)
+            index += 4;
+            result.push([tagNum, "功能点数量", parseInt(tagNum, 16)]);
+
+            while (index < inputValue.length - 1) {
+                var funcId = inputValue.substr(index, 4)
+                index += 4;
+                result.push([funcId, "ID", parseInt(funcId, 16)]);
+
+                var support = inputValue.substr(index, 4)
+                supportMsg = support
+                index += 4;
+                switch (support) {
+                    case '0000':
+                        supportMsg += " 不支持"
+                        break;
+                    case '0001':
+                        supportMsg += " 支持"
+                        break;
+                    default:
+                        break;
+                }
+                result.push([support, "是否支持", supportMsg]);
+
+                var funcParamLen = inputValue.substr(index, 4)
+                var funcParamLenVal = parseInt(funcParamLen, 16)
+                index += 4;
+                result.push([funcParamLen, "len", funcParamLenVal]);
+
+                var funcParam = inputValue.substr(index, funcParamLenVal * 2)
+                index += funcParamLenVal * 2;
+                result.push([funcParam, "param", funcParam]);
+            }
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse41aaReq(inputValue) {
+            // 41aa请求报文样例
+            // inputValue = "0008 0002 0101 0002 0001 0002".replaceAll(" ", "");
+            var result = [];
+            var index = 0;
+            var dataLengthMsg = inputValue.substr(index, 4)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 4;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var cfgNum = inputValue.substr(index, 4)
+            index += 4;
+            result.push([cfgNum, "配置项数量", parseInt(cfgNum, 16)]);
+
+            var tagNum = inputValue.substr(index, 2)
+            index += 2;
+            result.push([tagNum, "Tag数量", parseInt(tagNum, 16)]);
+
+            var tag = inputValue.substr(index, 2)
+            index += 2;
+            result.push([tag, "Tag", tag]);
+
+            var contentLen = inputValue.substr(index, 4)
+            index += 4;
+            result.push([contentLen, "内容长度", contentLen]);
+
+            for (let i = 0; i < cfgNum; i++) {
+                var cfgItemId = inputValue.substr(index, 4)
+                index += 4;
+                result.push([cfgItemId, "配置项", cfgItemId]);
+            }
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function parse41aaResp(inputValue) {
+            // 41aa响应报文样例
+            // inputValue = "AA00 0E00 0001 0102 0007 0001 017F FFFF FF".replaceAll(" ", "");
+            var result = [];
+            var index = 2;
+            var dataLengthMsg = inputValue.substr(index, 4)
+            var dataLength = parseInt(dataLengthMsg, 16);
+            index += 4;
+            result.push([dataLengthMsg, "数据长度", dataLength.toString(10)]);
+
+            var status = inputValue.substr(index, 2)
+            index += 2;
+            result.push([status, "核查状态", status]);
+
+            var cfgNum = inputValue.substr(index, 4)
+            index += 4;
+            result.push([cfgNum, "配置项数量", parseInt(cfgNum, 16)]);
+
+            var tagNum = inputValue.substr(index, 2)
+            index += 2;
+            result.push([tagNum, "Tag数量", parseInt(tagNum, 16)]);
+
+            var tag = inputValue.substr(index, 2)
+            index += 2;
+            result.push([tag, "Tag", tag]);
+
+            var contentLen = inputValue.substr(index, 4)
+            index += 4;
+            result.push([contentLen, "内容长度", contentLen]);
+
+            // for (let i = 0; i < cfgNum; i++) {
+            while (index < inputValue.length - 1) {
+                var cfgItemId = inputValue.substr(index, 4)
+                index += 4;
+                result.push([cfgItemId, "配置项", cfgItemId]);
+
+                var level = inputValue.substr(index, 2)
+                index += 2;
+                levelMsg = level
+                switch (level) {
+                    case '00':
+                        levelMsg += " 无风险"
+                        break;
+                    case '01':
+                        levelMsg += " 低风险"
+                        break;
+                    case '02':
+                        levelMsg += " 中风险"
+                        break;
+                    case '03':
+                        levelMsg += " 高风险"
+                        break;
+                    default:
+                        break;
+                }
+                result.push([level, "风险等级", levelMsg]);
+
+                var cfgItemValue = inputValue.substr(index, 8)
+                index += 8;
+                result.push([cfgItemValue, "配置值", cfgItemValue]);
+            }
+
+            document.getElementById("resultListTextArea").value = getDisplayResult(result, 8);
+            extendTextArea("resultListTextArea", result.length, -1);
+        }
+
+        function getDataSegment(dataArray, len) {
+            var ret = "";
+            while (len > 0) {
+                ret += dataArray.shift();
+                len--;
+            }
+            return ret;
+        }
+
+        function getDisplayResult(result, len) {
+            displayResult = [];
+            result.forEach(item => {
+                var oriData = item[0].padStart(len, " ");
+                if (oriData.length > len && len > 3) {
+                    oriData = oriData.substr(0, len - 3) + "...";
+                }
+                let line = oriData
+                var filedName = item[1];
+                var filedValue = item[2];
+
+                if (item[0] !== "") {
+                    line += " : "
+                } else {
+                    line += "   "
+                }
+                if (filedName !== "" || filedValue !== "") {
+                    line += filedName + " " + filedValue
+                }
+                displayResult.push(line);
+            });
+            return displayResult.join("\n");
+        }
+
+        function parseStr(originStr) {
+            var ret = "";
+            while (originStr.length > 0) {
+                var tmp = originStr.substr(0, 2);
+                ret += String.fromCharCode(parseInt(tmp, 16));
+                originStr = originStr.substr(2);
+            }
+            return ret;
+        }
+
+        function parseIp(originStr) {
+            var ret = [];
+            while (originStr.length > 0) {
+                var tmp = originStr.substr(0, 2);
+                ret.push(parseInt(tmp, 16).toString(10));
+                originStr = originStr.substr(2);
+            }
+            return ret.join(".");
+        }
+
+        function decodeUrl() {
+            document.getElementById("decodedUrl").value = "";
+            var encodedUrl = document.getElementById("encodedUrl").value;
+            // encodedUrl = "https://10.44.208.82:31943/rest/neteco/web/organization/v2/tree?parentDn=%2F&self=true&incremental=true&pageId=1&cond=%7B%22BUSINESS_DEVICE%22%3A1%2C%22DOMAIN%22%3A0%2C%22DEVICE_TYPE%22%3A%2223023%2C23021%2C23020%2C23022%2C23010%2C23024%2C23050%2C23045%2C23039%2C23019%2C23040%2C23043%2C23051%2C23053%22%2C%22CONNECT_STATUS%22%3A%221%22%7D&_=1634124610047"
+            if (encodedUrl.length == 0) {
+                return;
+            }
+            // console.log(encodedUrl);
+
+            var fiedls = encodedUrl.split("?");
+            if (fiedls.length == 1 && encodedUrl.startsWith("http")) {
+                document.getElementById("decodedUrl").value = fiedls[0];
+                return;
+            }
+
+            var decodedUrl = [];
+            var paramsFields = ""
+            if (encodedUrl.startsWith("http")) {
+                decodedUrl.push(fiedls[0]);
+                paramsFields = fiedls[1];
+            } else {
+                paramsFields = fiedls[0]
+            }
+
+            var params = paramsFields.split("&");
+            var lineNum = 1;
+            params.forEach(param => {
+                var key = param.split("=")[0];
+                var val = decodeURIComponent(param.split("=")[1]);
+                decodedUrl.push(key += "=" + val);
+                lineNum += 1;
+            });
+            // console.log(decodedUrl);
+            // console.log(decodedUrl.length);
+            document.getElementById("decodedUrl").value = decodedUrl.join("\n");
+            extendTextArea("decodedUrl", decodedUrl.length, -1);
+        }
+
+        function encodeUrl() {
+            document.getElementById("encodedUrl").value = "";
+            var decodedUrl = document.getElementById("decodedUrl").value;
+            if (decodedUrl.length == 0) {
+                return;
+            }
+            // console.log(decodedUrl);
+            var lines = decodedUrl.split("\n");
+            var encodedUrl = '';
+            var isBasicUrl = decodedUrl.startsWith("http");
+            lines.forEach(param => {
+                if (isBasicUrl) {
+                    encodedUrl += param + "?";
+                    isBasicUrl = false;
+                    return;
+                }
+                var index = param.indexOf("=")
+                var key = param.substring(0, index);
+                var val = encodeURIComponent(param.substring(index + 1));
+                encodedUrl += key + "=" + val + "&";
+            });
+            // console.log(encodedUrl);
+            document.getElementById("encodedUrl").value = encodedUrl.substr(0, encodedUrl.length - 1);
+        }
+
+        function extendTextArea(elementById, height, width) {
+            if (height !== -1) {
+                document.getElementById(elementById).style.height = height * 20 + 'px';
+            }
+            if (width !== -1) {
+                document.getElementById(elementById).style.width = width * 18 + 'px';
+            }
+        }
+
+        function onProtocolChanged(event) {
+            // debugger
+            // console.log(event.target.value);
+            if (event.target.value == "imodbus") {
+                document.getElementById('imodbusMessageType').style.display = 'inline';
+                document.getElementById('bin35MessageType').style.display = 'none';
+            } else {
+                document.getElementById('imodbusMessageType').style.display = 'none';
+                document.getElementById('bin35MessageType').style.display = 'inline';
+            }
+        }
+
+    </script>
+</head>
+
+<body>
+    <div>
+        <img src="https://www-file.huawei.com/-/media/corporate/images/home/logo/huawei_logo.png" height="40" />
+    </div>
+
+    <div id="frame">
+        <div id="header1">sTool v0.9.8 beta</div>
+
+        <!-- 时间转换 -->
+        <p>
+            <label style="font-weight: bold;">各时区时间转换为Unix时间戳</label>
+        </p>
+
+        <div class="field">
+            <select name="inputTimeZone2" id="inputTimeZone2">
+                <option value="-11">-11中途岛</option>
+                <option value="-10">-10檀香山</option>
+                <option value="-09">-09阿拉斯加</option>
+                <option value="-08">-08洛杉矶</option>
+                <option value="-07">-07凤凰城</option>
+                <option value="-06">-06墨西哥城</option>
+                <option value="-05">-05纽约</option>
+                <option value="-04">-04圣地亚哥</option>
+                <option value="-03">-03巴西利亚</option>
+                <option value="-02">-02费尔南多</option>
+                <option value="-01">-01佛德尔群岛</option>
+                <option value="+00">+00伦敦</option>
+                <option value="+01">+01巴黎</option>
+                <option value="+02">+02雅典</option>
+                <option value="+03">+03莫斯科</option>
+                <option value="+04">+04阿布扎比</option>
+                <option value="+05">+05伊斯兰堡</option>
+                <option value="+06">+06仰光</option>
+                <option value="+07">+07新加坡</option>
+                <option value="+08" selected>+08北京</option>
+                <option value="+09">+09东京</option>
+                <option value="+10">+10墨尔本</option>
+                <option value="+11">+11所罗门群岛</option>
+                <option value="+12">+12惠灵顿</option>
+            </select>
+            时间
+            <input id="year" type="text" style="width:42px" size="12" onkeyup="execTab(year.value,4,'month')" />年
+            <input id="month" type="text" style="width:26px" size="12" onkeyup="execTab(month.value,2,'day')" />月
+            <input id="day" type="text" style="width:26px" size="12" onkeyup="execTab(day.value,2,'hour')" />日
+            <input id="hour" type="text" style="width:26px" size="12" onkeyup="execTab(hour.value,2,'minute')" />时
+            <input id="minute" type="text" style="width:26px" size="12" onkeyup="execTab(minute.value,2,'second')" />分
+            <input id="second" type="text" style="width:26px" size="12"
+                onkeyup="execTab(second.value,2,'transferUtcTimeToUnixTime')" />秒
+            <input id="transferUtcTimeToUnixTime" type="button" value="转换为Unix时间"
+                onclick="transferUtcTimeToUnixTime(inputTimeZone2.value)" />
+            <input id="unixTimeOut" type="text" style="width:125px" size="12" />
+        </div>
+
+        <p>
+            <label style="font-weight: bold;">Unix时间转换为各时区时间</label>
+        </p>
+        <div class="field">
+            <input id="unixTimeIn1" type="text" style="width:160px" size="12" />
+            <input type="button" value="转换为指定时区时间" onclick="transferUnixTimestampToLocalTimeJs(inputTimeZone1.value)" />
+            <select name="inputTimeZone1" id="inputTimeZone1">
+                <option value="-11">-11中途岛</option>
+                <option value="-10">-10檀香山</option>
+                <option value="-09">-09阿拉斯加</option>
+                <option value="-08">-08洛杉矶</option>
+                <option value="-07">-07凤凰城</option>
+                <option value="-06">-06墨西哥城</option>
+                <option value="-05">-05纽约</option>
+                <option value="-04">-04圣地亚哥</option>
+                <option value="-03">-03巴西利亚</option>
+                <option value="-02">-02费尔南多</option>
+                <option value="-01">-01佛德尔群岛</option>
+                <option value="+00">+00伦敦</option>
+                <option value="+01">+01巴黎</option>
+                <option value="+02">+02雅典</option>
+                <option value="+03">+03莫斯科</option>
+                <option value="+04">+04阿布扎比</option>
+                <option value="+05">+05伊斯兰堡</option>
+                <option value="+06">+06仰光</option>
+                <option value="+07">+07新加坡</option>
+                <option value="+08" selected>+08北京</option>
+                <option value="+09">+09东京</option>
+                <option value="+10">+10墨尔本</option>
+                <option value="+11">+11所罗门群岛</option>
+                <option value="+12">+12惠灵顿</option>
+            </select>
+
+            <input id="utcTime1" type="text" style="width:270px" size="12" />
+        </div>
+
+
+        <p>
+            <label style="font-weight: bold;">世界标准时间转换</label>
+        </p>
+        <div class="field">
+            <select name="inputTimeZone" id="inputTimeZone">
+                <option value="-11">-11中途岛</option>
+                <option value="-10">-10檀香山</option>
+                <option value="-09">-09阿拉斯加</option>
+                <option value="-08">-08洛杉矶</option>
+                <option value="-07">-07凤凰城</option>
+                <option value="-06">-06墨西哥城</option>
+                <option value="-05">-05纽约</option>
+                <option value="-04">-04圣地亚哥</option>
+                <option value="-03">-03巴西利亚</option>
+                <option value="-02">-02费尔南多</option>
+                <option value="-01">-01佛德尔群岛</option>
+                <option value="+00">+00伦敦</option>
+                <option value="+01">+01巴黎</option>
+                <option value="+02">+02雅典</option>
+                <option value="+03">+03莫斯科</option>
+                <option value="+04">+04阿布扎比</option>
+                <option value="+05">+05伊斯兰堡</option>
+                <option value="+06">+06仰光</option>
+                <option value="+07">+07新加坡</option>
+                <option value="+08" selected>+08北京</option>
+                <option value="+09">+09东京</option>
+                <option value="+10">+10墨尔本</option>
+                <option value="+11">+11所罗门群岛</option>
+                <option value="+12">+12惠灵顿</option>
+            </select>
+            <input id="inputZoneTime" type="text" style="width:185px" size="12" />
+            <input type="button" value="<<"
+                onclick="worldTimeConvert(outputTimeZone.value, inputTimeZone.value, outputZoneTime.value, 'inputZoneTime')" />
+            <input type="button" value=">>"
+                onclick="worldTimeConvert(inputTimeZone.value, outputTimeZone.value, inputZoneTime.value, 'outputZoneTime')" />
+            <select name="outputTimeZone" id="outputTimeZone">
+                <option value="-11">-11中途岛</option>
+                <option value="-10">-10檀香山</option>
+                <option value="-09">-09阿拉斯加</option>
+                <option value="-08">-08洛杉矶</option>
+                <option value="-07">-07凤凰城</option>
+                <option value="-06">-06墨西哥城</option>
+                <option value="-05">-05纽约</option>
+                <option value="-04">-04圣地亚哥</option>
+                <option value="-03">-03巴西利亚</option>
+                <option value="-02">-02费尔南多</option>
+                <option value="-01">-01佛德尔群岛</option>
+                <option value="+00" selected>+00伦敦</option>
+                <option value="+01">+01巴黎</option>
+                <option value="+02">+02雅典</option>
+                <option value="+03">+03莫斯科</option>
+                <option value="+04">+04阿布扎比</option>
+                <option value="+05">+05伊斯兰堡</option>
+                <option value="+06">+06仰光</option>
+                <option value="+07">+07新加坡</option>
+                <option value="+08">+08北京</option>
+                <option value="+09">+09东京</option>
+                <option value="+10">+10墨尔本</option>
+                <option value="+11">+11所罗门群岛</option>
+                <option value="+12">+12惠灵顿</option>
+            </select>
+            <input id="outputZoneTime" type="text" style="width:190px" size="12" />
+        </div>
+
+        <!-- Unicode转换 -->
+        <br />
+        <p>
+            <label style="font-weight: bold;">普通字符转Unicode</label>
+        </p>
+        <div class="field">
+            <input id="chineseString2" type="text" style="width:300px" size="12" />
+            <input type="button" style="width:83px" value="转Unicode" onclick="transferChineseToUnicode()" />
+            <input id="unicodeString2" type="text" style="width:305px" size="12" />
+        </div>
+
+        <p>
+            <label style="font-weight: bold;">Unicode转普通字符</label>
+        </p>
+        <div class="field">
+            <input id="unicodeString" type="text" style="width:300px" size="12" />
+            <input type="button" value="转普通字符" onclick="transferUnicodeToChinese()" />
+            <input id="chineseString" type="text" style="width:305px" size="12" />
+        </div>
+
+        <!-- 进制转换 -->
+        <br />
+        <p>
+            <label style="font-weight: bold;">进制转换</label>
+            <!--
+            <select name="dataLen" id="dataLen">
+                <option value="ULIMITED" selected>无限</option>
+                <option value="SIN_SHORT">SIN_SHORT|2字节</option>
+                <option value="UNSIN_SHORT">UNSIN_SHORT|2字节</option>
+                <option value="SIN_INT">SIN_INT|4字节</option>
+                <option value="UNSIN_INT">UNSIN_INT|4字节</option>
+                <option value="SIN_LONG">SIN_LONG|8字节</option>
+                <option value="UNSIN_LONG">UNSIN_LONG|8字节</option>
+            </select>
+            -->
+        </p>
+        <div class="field">
+            02进制
+            <input id="binValue" type="text" style="width:312px;text-align:right" size="12" onblur="elementBlur('2')" />
+            <input type="button" value="转换" onclick="transValue('binValue', 2)" />
+        </div>
+        <div class="field">
+            08进制
+            <input id="octValue" type="text" style="width:312px;text-align:right" size="12" onblur="elementBlur('8')" />
+            <input type="button" value="转换" onclick="transValue('octValue', 8)" />
+        </div>
+        <div class="field">
+            10进制
+            <input id="decValue" type="text" style="width:312px;text-align:right" size="12"
+                onblur="elementBlur('10')" />
+            <input type="button" value="转换" onclick="transValue('decValue', 10)" />
+        </div>
+        <div class="field">
+            16进制
+            <!--
+            <select name="endianValue" id="endianValue">
+                <option value="0123" selected>大端序</option>
+                <option value="3210">小端序</option>
+                <option value="2301">小端序(16)</option>
+            </select>
+            -->
+            <input id="hexValue" type="text" style="width:312px;text-align:right" size="12"
+                onblur="elementBlur('16')" />
+            <input type="button" value="转换" onclick="transValue('hexValue', 16)" />
+
+            <!--
+            &nbsp;&nbsp;大端序 <input id="hexValue1" type="text" style="width:168px;text-align:right" size="12" readonly="true" />
+            小端序 <input id="hexValue2" type="text" style="width:168px;text-align:right" size="12" readonly="true" />
+            16位寄存器小端 <input id="hexValue3" type="text" style="width:168px;text-align:right" size="12" readonly="true" />
+            -->
+        </div>
+        <br />
+
+        <!-- 表达式求值 -->
+        <!--
+        <p>
+            <label style="font-weight: bold;">表达式求值</label>
+        </p>
+        <div class="field">
+            <input id="expression" type="text" style="width:315px" size="12" onblur="elementBlur('16')" />
+            <input type="button" value="计算" onclick="calculateExpression(expression.value)" />
+            &nbsp;&nbsp;<input id="expressionValue" type="text" style="width:168px" size="12" readonly="true" />
+        </div>
+        -->
+
+        <!-- 订阅块日志解析 -->
+        <br />
+        <p>
+            <label style="font-weight: bold;">订阅块日志解析</label>
+        </p>
+        <div class="field">
+            订阅日志 <input id="subscribeBlock" type="text" style="width:300px;text-align:left" size="12" />
+        </div>
+        <div class="field">
+            性能报文
+            <input id="longFrameResp" type="text" style="width:300px;text-align:left" size="12" />
+            <input type="button" value="解析" onclick="parseSubscribeBlock()" />
+        </div>
+        <div class="field">
+            <!--解析结果-->
+            <!--
+            <textarea rows="1" style="width:300px;text-align:left" id="regAddrList" readonly="true"></textarea>
+            -->
+            <textarea rows="1" style="width:365px;text-align:left" id="regAddrList" readonly="true"></textarea>
+        </div>
+
+        <!-- 414b/4147报文解析 -->
+        <br />
+        <p>
+            <label style="font-weight: bold;">报文解析</label>
+        </p>
+
+        <div class="field">
+            <select name="protocolType" id="protocolType" onchange="onProtocolChanged(event)">
+                <option value="imodbus" selected>IMODBUS</option>
+                <option value="bin35">BIN3.5</option>
+            </select>
+            <select name="imodbusMessageType" id="imodbusMessageType" style="width:150px;">
+                <option value="03_REQ">0x03 请求 (读寄存器)</option>
+                <option value="06_REQ">0x06 请求 (写单个寄存器)</option>
+                <option value="10_REQ">0x10 请求 (写多个寄存器)</option>
+
+                <option value="4105_REQ">0x4105 请求 (开始多帧传输)</option>
+                <option value="4105_RESP">0x4105 响应 (开始多帧传输)</option>
+                <option value="4106_REQ">0x4106 请求 (执行多帧传输)</option>
+                <option value="4106_RESP">0x4106 响应 (执行多帧传输)</option>
+
+                <option value="410e_REQ">0x410e 请求 (开始FTP传输)</option>
+                <option value="410f_RESP">0x410f 响应</option>
+                <option value="4133_REQ">0x4133 请求(多段数据查询)</option>
+                <option value="4133_RESP">0x4133 响应(多段数据查询)</option>
+                <option value="4144_RESP">0x4144 响应(自注册数据查询)</option>
+                <option value="414b_REQ">0x414b 请求</option>
+                <option value="4147_RESP" selected>0x4147 响应</option>
+
+                <option value="4190_REQ">0x4190 请求(秒级上报注册订阅)</option>
+                <option value="4191_RESP">0x4191 响应(秒级上报)</option>
+                <option value="4192_REQ">0x4192 请求(秒级上报取消订阅)</option>
+
+                <option value="419b_REQ">0x419b 请求</option>
+                <option value="4196_RESP">0x4196 请求</option>
+
+                <option value="41a9_REQ">0x41a9 请求</option>
+                <option value="41a9_RESP">0x41a9 响应</option>
+                <option value="41aa_REQ">0x41aa 请求</option>
+                <option value="41aa_RESP">0x41aa 响应</option>
+
+            </select>
+            <select name="bin35MessageType" id="bin35MessageType" style="width:150px;display:none">
+                <option value="0017_REQ" selected>0x0010 请求(申请接入)</option>
+            </select>
+            <input id="toParseMessage" type="text" style="width:305px;text-align:left" size="12"
+                onblur="elementBlur('2')" />
+            <input type="button" value="解析" onclick="parseMessage()" />
+        </div>
+        <div class="field">
+            <textarea rows="1" cols="160" id="resultListTextArea"></textarea>
+        </div>
+
+        <!-- URL编解码 -->
+        <br />
+        <p>
+            <label style="font-weight: bold;">URL编解码</label>
+        </p>
+        <div class="field">
+            <input id="encodedUrl" type="text" style="width:1300px;text-align:left" size="12" />
+        </div>
+        <div class="field">
+            <input type="button" value="URL解码↓" onclick="decodeUrl()" />
+            <input type="button" value="URL编码↑" onclick="encodeUrl()" />
+        </div>
+        <div class="field">
+            <textarea rows="1" cols="160" id="decodedUrl"></textarea>
+        </div>
+        <br />
+
+        <!-- JSON格式化 -->
+        <p>
+            <label style="font-weight: bold;">JSON格式化</label>
+        </p>
+        <div class="field">
+            <input id="rawJson" type="text" style="width:300px" size="12" />
+            <input type="button" value="格式化" onclick="formatJson()" />
+            <input type="button" value="转字符串" onclick="jsonToStr()" />
+            <div class="field" style="margin-top:05px">
+                <textarea rows="3" cols="85" id="formatedJson"></textarea>
+            </div>
+        </div>
+        <br />
+
+        <!-- Header生成 -->
+        <p>
+            <label style="font-weight: bold;">Header生成</label>
+        </p>
+        <div class="field">
+            <!--
+                        <input id="rawHeader" type="text" style="width:300px" size="12" />
+                    -->
+            <input type="button" value="生成Header" onclick="transRawHeaderToCode()" />
+            <div class="field" style="margin-top:05px">
+                <textarea rows="3" cols="85" id="headerCode"></textarea>
+            </div>
+        </div>
+        <br />
+
+        <div class="field">
+        </div>
+        <div class="footer">
+            ---- Powered by y00801659 ----
+        </div>
+
+    </div>
+
+</body>
+
+</html>
