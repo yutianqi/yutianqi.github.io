@@ -20,24 +20,24 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="一直都很喜欢 利器 这个项目，在这里分享一下我自己的利器吧。">
+  <meta name="description" content="bypy是百度网盘的Python客户端，本文主要记录在树莓派上使用bypy实现百度网盘上传下载配置过程。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="我的利器">
-<meta property="og:url" content="http://example.com/2018/10/29/2018/10-28_%E6%88%91%E7%9A%84%E5%88%A9%E5%99%A8/index.html">
+<meta property="og:title" content="树莓派使用bypy实现百度网盘上传下载">
+<meta property="og:url" content="http://example.com/2018/03/19/2018/03-19_%E6%A0%91%E8%8E%93%E6%B4%BE%E4%BD%BF%E7%94%A8%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD/index.html">
 <meta property="og:site_name" content="Duke&#39;s Tech Blog">
-<meta property="og:description" content="一直都很喜欢 利器 这个项目，在这里分享一下我自己的利器吧。">
+<meta property="og:description" content="bypy是百度网盘的Python客户端，本文主要记录在树莓派上使用bypy实现百度网盘上传下载配置过程。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/images/siliconvalley.jpg">
-<meta property="article:published_time" content="2018-10-28T23:14:44.000Z">
+<meta property="article:published_time" content="2018-03-19T12:12:55.000Z">
 <meta property="article:modified_time" content="2024-12-03T02:29:20.439Z">
 <meta property="article:author" content="Duke">
-<meta property="article:tag" content="程序员的自我修养">
 <meta property="article:tag" content="2018">
-<meta property="article:tag" content="十月">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="RaspberryPi">
+<meta property="article:tag" content="三月">
+<meta property="article:tag" content="百度网盘">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/siliconvalley.jpg">
 
-<link rel="canonical" href="http://example.com/2018/10/29/2018/10-28_%E6%88%91%E7%9A%84%E5%88%A9%E5%99%A8/">
+<link rel="canonical" href="http://example.com/2018/03/19/2018/03-19_%E6%A0%91%E8%8E%93%E6%B4%BE%E4%BD%BF%E7%94%A8%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD/">
 
 
 <script id="page-configurations">
@@ -50,7 +50,7 @@
   };
 </script>
 
-  <title>我的利器 | Duke's Tech Blog</title>
+  <title>树莓派使用bypy实现百度网盘上传下载 | Duke's Tech Blog</title>
   
 
 
@@ -194,7 +194,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2018/10/29/2018/10-28_%E6%88%91%E7%9A%84%E5%88%A9%E5%99%A8/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/03/19/2018/03-19_%E6%A0%91%E8%8E%93%E6%B4%BE%E4%BD%BF%E7%94%A8%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://s.gravatar.com/avatar/761871be255f7ab6137305690ea386ac?s=80">
@@ -207,7 +207,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          我的利器
+          树莓派使用bypy实现百度网盘上传下载
         </h1>
 
         <div class="post-meta">
@@ -217,8 +217,8 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2018-10-29 07:14:44" itemprop="dateCreated datePublished" datetime="2018-10-29T07:14:44+08:00">2018-10-29 07:14:44</time>
-              <!-- <time title="创建时间：2018-10-29 07:14:44" itemprop="dateCreated datePublished" datetime="2018-10-29T07:14:44+08:00">2018-10-29</time> -->
+              <time title="创建时间：2018-03-19 20:12:55" itemprop="dateCreated datePublished" datetime="2018-03-19T20:12:55+08:00">2018-03-19 20:12:55</time>
+              <!-- <time title="创建时间：2018-03-19 20:12:55" itemprop="dateCreated datePublished" datetime="2018-03-19T20:12:55+08:00">2018-03-19</time> -->
             </span>
 
           
@@ -239,45 +239,25 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>一直都很喜欢 <strong><a target="_blank" rel="noopener" href="http://liqi.io/creators/" title="利器">利器</a></strong> 这个项目，在这里分享一下我自己的利器吧。</p>
+        <p>bypy是百度网盘的Python客户端，本文主要记录在树莓派上使用bypy实现百度网盘上传下载配置过程。</p>
 <span id="more"></span>
 
-<h4 id="介绍一下你自己和所做的工作。"><a href="#介绍一下你自己和所做的工作。" class="headerlink" title="介绍一下你自己和所做的工作。"></a>介绍一下你自己和所做的工作。</h4><p>我希望能够在和别人做自我介绍的时候，可以说自己是一名软件研发工程师。</p>
-<h4 id="你都在使用哪些硬件？"><a href="#你都在使用哪些硬件？" class="headerlink" title="你都在使用哪些硬件？"></a>你都在使用哪些硬件？</h4><ul>
-<li><p>ThinkPad X1 Carbon 2018<br>公司配的电脑，我喜欢自己的生活中只有一台电脑，我不排斥工作和生活混在一起。</p>
-</li>
-<li><p>iPhone 5s<br>现在已经是2018年10月，我还在用iPhone 5s 16G。这是我的第二部手机，已经陪伴我5年多了，前段时间第二次换了电池。因为平时的重心都在电脑上，所以并不会感觉这部手机不够用。</p>
-</li>
-<li><p>FILCO忍者二代机械键盘<br>红轴，双模，无刻，唯一的遗憾是当初犹豫再三之后还是选了104键的版本。现在想想，无论是对于有限的桌面空间，还是为了方便携带，87键都是一个更好的选择。小键盘输入数字的确更加方便，但是我对这个的需求其实并没有当初想的那么强烈，尤其是在已经习惯了笔记本的布局之后。</p>
-</li>
-<li><p>Kindle Paperwhite<br>间歇性疯狂读书。</p>
-</li>
-<li><p>Sony运动耳机 (NW-WS414)<br>女朋友送的第一个生日礼物。</p>
-</li>
+<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><ul>
+<li>已安装Python</li>
+<li>已安装requests类库(sudo pip install requests)</li>
 </ul>
-<ul>
-<li>Raspberry Pi 3B<br>当初心心念念，现在因为找不到刚需使用场景而吃灰中。</li>
+<h2 id="安装bypy"><a href="#安装bypy" class="headerlink" title="安装bypy"></a>安装bypy</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pip install bypy                                       # 安装bypy</span><br></pre></td></tr></table></figure>
+
+<h2 id="验证bypy并授权"><a href="#验证bypy并授权" class="headerlink" title="验证bypy并授权"></a>验证bypy并授权</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo bypy.py info                                           # 验证bypy并授权</span><br><span class="line">python -m bypy info</span><br></pre></td></tr></table></figure>
+<p>复制”Please Visit:”下的网址，登陆百度账号，并复制授权码。<br>授权成功后会看到授权网盘的总容量和已使用容量等信息。</p>
+<h2 id="bypy相关指令"><a href="#bypy相关指令" class="headerlink" title="bypy相关指令"></a>bypy相关指令</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">bypy.py upload                                              # 把当前目录同步到云盘</span><br><span class="line">bypy.py downdir                                             # 把云盘内容同步到本地来</span><br><span class="line">bypy.py syncdown                                            # 把云盘内容同步到本地来</span><br><span class="line">bypy.py compare                                             # 比较本地当前目录和云盘根目录</span><br></pre></td></tr></table></figure>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><ul>
+<li>百度网盘下bypy同步路径：/我的应用数据/bypy</li>
 </ul>
-<h4 id="软件呢？"><a href="#软件呢？" class="headerlink" title="软件呢？"></a>软件呢？</h4><ul>
-<li>Chrome</li>
-<li>cmder</li>
-<li>Notepad++</li>
-<li>SublimeText3</li>
-<li>VSCode</li>
-<li>IntelliJ IDEA</li>
-<li>SecureCRT</li>
-<li>Everything</li>
-<li>BeyondCompare</li>
-<li>Navicat Premium 12</li>
-<li>Bandizip</li>
-<li>Postman</li>
-<li>Shadowsocks</li>
-<li>SpeedPan</li>
-<li>FSCapture</li>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/houtianze/bypy">bypy Github</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xiaowuyi/p/4160397.html">利用bypy实现树莓派NAS同步百度云</a></li>
 </ul>
-<h4 id="你最理想的工作环境是什么？"><a href="#你最理想的工作环境是什么？" class="headerlink" title="你最理想的工作环境是什么？"></a>你最理想的工作环境是什么？</h4><p>曾经有一天，突然觉得美剧<Silicon Valley>中，Richard他们一起工作生活的那个House就是我最渴望的工作环境。<br><img src="/images/siliconvalley.jpg" alt="&quot;siliconvalley&quot;"></p>
-<h4 id="你平时获得工作灵感的方式有哪些？"><a href="#你平时获得工作灵感的方式有哪些？" class="headerlink" title="你平时获得工作灵感的方式有哪些？"></a>你平时获得工作灵感的方式有哪些？</h4><p>逛<a target="_blank" rel="noopener" href="https://www.zhihu.com/">知乎</a>，<a target="_blank" rel="noopener" href="https://www.v2ex.com/">V2EX</a>。有时候会觉得，可能我一直都未曾真正有过灵感。</p>
-<h4 id="推荐一件生活中的利器给大家。"><a href="#推荐一件生活中的利器给大家。" class="headerlink" title="推荐一件生活中的利器给大家。"></a>推荐一件生活中的利器给大家。</h4><p>身边越来越多的人开始切换到了Windows10，每次看到别人任务栏上不曾使却又存在着的搜索框，我就会在心里小小的“鄙视”一下这个人。<a target="_blank" rel="noopener" href="https://jingyan.baidu.com/article/a378c960a7f625b32828303d.html"><strong>单击三次鼠标即可关闭</strong></a>，不要让它再占用你“寸土寸金”的任务栏啦！<br>还有将键盘上的CapsLock键映射为Ctrl键，相信我，世界从此不同。</p>
 
     </div>
 
@@ -290,9 +270,11 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/" rel="tag"># 程序员的自我修养</a>
               <a href="/tags/2018/" rel="tag"># 2018</a>
-              <a href="/tags/%E5%8D%81%E6%9C%88/" rel="tag"># 十月</a>
+              <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/RaspberryPi/" rel="tag"># RaspberryPi</a>
+              <a href="/tags/%E4%B8%89%E6%9C%88/" rel="tag"># 三月</a>
+              <a href="/tags/%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98/" rel="tag"># 百度网盘</a>
           </div>
 
         
@@ -301,12 +283,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2018/03/20/2018/03-19_%E6%A0%91%E8%8E%93%E6%B4%BE%E4%BD%BF%E7%94%A8%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD/" rel="prev" title="树莓派使用bypy实现百度网盘上传下载">
-      <i class="fa fa-chevron-left"></i> 树莓派使用bypy实现百度网盘上传下载
+    <a href="/2018/02/28/2018/02-28_Windows%E7%A6%BB%E7%BA%BF%E5%AE%89%E8%A3%85MySQL5-7-21/" rel="prev" title="Windows离线安装MySQL5.7.21">
+      <i class="fa fa-chevron-left"></i> Windows离线安装MySQL5.7.21
     </a></div>
       <div class="post-nav-item">
-    <a href="/2022/05/05/2022/05-04_macOS%E4%B8%8B%E7%9A%84%E7%BB%88%E7%AB%AF%E6%A8%A1%E6%8B%9F%E8%BD%AF%E4%BB%B6/" rel="next" title="macOS下的终端模拟软件">
-      macOS下的终端模拟软件 <i class="fa fa-chevron-right"></i>
+    <a href="/2018/10/28/2018/10-28_%E6%88%91%E7%9A%84%E5%88%A9%E5%99%A8/" rel="next" title="我的利器">
+      我的利器 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -367,7 +349,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D%E4%B8%80%E4%B8%8B%E4%BD%A0%E8%87%AA%E5%B7%B1%E5%92%8C%E6%89%80%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%E3%80%82"><span class="nav-number">1.</span> <span class="nav-text">介绍一下你自己和所做的工作。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%A0%E9%83%BD%E5%9C%A8%E4%BD%BF%E7%94%A8%E5%93%AA%E4%BA%9B%E7%A1%AC%E4%BB%B6%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">你都在使用哪些硬件？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E5%91%A2%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">软件呢？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%A0%E6%9C%80%E7%90%86%E6%83%B3%E7%9A%84%E5%B7%A5%E4%BD%9C%E7%8E%AF%E5%A2%83%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">你最理想的工作环境是什么？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%A0%E5%B9%B3%E6%97%B6%E8%8E%B7%E5%BE%97%E5%B7%A5%E4%BD%9C%E7%81%B5%E6%84%9F%E7%9A%84%E6%96%B9%E5%BC%8F%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">你平时获得工作灵感的方式有哪些？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%A8%E8%8D%90%E4%B8%80%E4%BB%B6%E7%94%9F%E6%B4%BB%E4%B8%AD%E7%9A%84%E5%88%A9%E5%99%A8%E7%BB%99%E5%A4%A7%E5%AE%B6%E3%80%82"><span class="nav-number">6.</span> <span class="nav-text">推荐一件生活中的利器给大家。</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E6%8F%90%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">前提条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85bypy"><span class="nav-number">2.</span> <span class="nav-text">安装bypy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81bypy%E5%B9%B6%E6%8E%88%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">验证bypy并授权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bypy%E7%9B%B8%E5%85%B3%E6%8C%87%E4%BB%A4"><span class="nav-number">4.</span> <span class="nav-text">bypy相关指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">5.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -518,7 +500,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'yutianqi.github.io',
       owner       : 'yutianqi',
       admin       : ['yutianqi'],
-      id          : '9f033746ad82ae320ed4bee3b8d79784',
+      id          : 'c0181fcf1a97b0cee18e81bf4b9c3093',
         language: 'zh-CN',
       distractionFreeMode: true
     });

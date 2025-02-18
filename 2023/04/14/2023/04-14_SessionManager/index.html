@@ -20,24 +20,23 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="bypy是百度网盘的Python客户端，本文主要记录在树莓派上使用bypy实现百度网盘上传下载配置过程。">
+  <meta name="description" content="对我来说，没有一个好用的终端模拟软件，MBP就无法成为一个合格的生产力工具…">
 <meta property="og:type" content="article">
-<meta property="og:title" content="树莓派使用bypy实现百度网盘上传下载">
-<meta property="og:url" content="http://example.com/2018/03/20/2018/03-19_%E6%A0%91%E8%8E%93%E6%B4%BE%E4%BD%BF%E7%94%A8%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD/index.html">
+<meta property="og:title" content="SessionManager：macOS下的终端模拟解决方案">
+<meta property="og:url" content="http://example.com/2023/04/14/2023/04-14_SessionManager/index.html">
 <meta property="og:site_name" content="Duke&#39;s Tech Blog">
-<meta property="og:description" content="bypy是百度网盘的Python客户端，本文主要记录在树莓派上使用bypy实现百度网盘上传下载配置过程。">
+<meta property="og:description" content="对我来说，没有一个好用的终端模拟软件，MBP就无法成为一个合格的生产力工具…">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2018-03-19T20:12:55.000Z">
-<meta property="article:modified_time" content="2024-12-03T02:29:20.439Z">
+<meta property="article:published_time" content="2023-04-14T09:53:32.000Z">
+<meta property="article:modified_time" content="2024-12-03T03:50:50.764Z">
 <meta property="article:author" content="Duke">
 <meta property="article:tag" content="Python">
-<meta property="article:tag" content="RaspberryPi">
-<meta property="article:tag" content="百度网盘">
-<meta property="article:tag" content="2018">
-<meta property="article:tag" content="三月">
+<meta property="article:tag" content="macOS">
+<meta property="article:tag" content="2023">
+<meta property="article:tag" content="四月">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2018/03/20/2018/03-19_%E6%A0%91%E8%8E%93%E6%B4%BE%E4%BD%BF%E7%94%A8%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD/">
+<link rel="canonical" href="http://example.com/2023/04/14/2023/04-14_SessionManager/">
 
 
 <script id="page-configurations">
@@ -50,7 +49,7 @@
   };
 </script>
 
-  <title>树莓派使用bypy实现百度网盘上传下载 | Duke's Tech Blog</title>
+  <title>SessionManager：macOS下的终端模拟解决方案 | Duke's Tech Blog</title>
   
 
 
@@ -194,7 +193,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2018/03/20/2018/03-19_%E6%A0%91%E8%8E%93%E6%B4%BE%E4%BD%BF%E7%94%A8%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/14/2023/04-14_SessionManager/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://s.gravatar.com/avatar/761871be255f7ab6137305690ea386ac?s=80">
@@ -207,7 +206,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          树莓派使用bypy实现百度网盘上传下载
+          SessionManager：macOS下的终端模拟解决方案
         </h1>
 
         <div class="post-meta">
@@ -217,8 +216,8 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2018-03-20 04:12:55" itemprop="dateCreated datePublished" datetime="2018-03-20T04:12:55+08:00">2018-03-20 04:12:55</time>
-              <!-- <time title="创建时间：2018-03-20 04:12:55" itemprop="dateCreated datePublished" datetime="2018-03-20T04:12:55+08:00">2018-03-20</time> -->
+              <time title="创建时间：2023-04-14 17:53:32" itemprop="dateCreated datePublished" datetime="2023-04-14T17:53:32+08:00">2023-04-14 17:53:32</time>
+              <!-- <time title="创建时间：2023-04-14 17:53:32" itemprop="dateCreated datePublished" datetime="2023-04-14T17:53:32+08:00">2023-04-14</time> -->
             </span>
 
           
@@ -239,25 +238,98 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>bypy是百度网盘的Python客户端，本文主要记录在树莓派上使用bypy实现百度网盘上传下载配置过程。</p>
+        <p>对我来说，没有一个好用的终端模拟软件，MBP就无法成为一个合格的生产力工具…</p>
 <span id="more"></span>
 
-<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><ul>
-<li>已安装Python</li>
-<li>已安装requests类库(sudo pip install requests)</li>
+<h2 id="我的需求"><a href="#我的需求" class="headerlink" title="我的需求"></a>我的需求</h2><ol>
+<li>Session管理：支持保存Session，支持多层级分组，Session文件可编辑。           </li>
+<li>登录脚本：支持在每次登录之后执行自定义命令，支持节点跳转。      </li>
+<li>多窗口同时输入： 支持多窗口同时输入。       </li>
+<li>自定义快捷键：支持Session复制，Tab切换，Tab重命名。                </li>
+<li>高颜值：好心情的基础           </li>
+<li>快捷命令：支持快捷命令。        </li>
+<li>记录文本的操作日志</li>
+<li>内嵌SFTP工具</li>
+</ol>
+<h2 id="软件基础"><a href="#软件基础" class="headerlink" title="软件基础"></a>软件基础</h2><ul>
+<li>iTerm2         </li>
+<li><a target="_blank" rel="noopener" href="https://github.com/yutianqi/SessionManager">SessionManager</a>（基于Python，pexpect库，iterm2库）</li>
 </ul>
-<h2 id="安装bypy"><a href="#安装bypy" class="headerlink" title="安装bypy"></a>安装bypy</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pip install bypy                                       # 安装bypy</span><br></pre></td></tr></table></figure>
-
-<h2 id="验证bypy并授权"><a href="#验证bypy并授权" class="headerlink" title="验证bypy并授权"></a>验证bypy并授权</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo bypy.py info                                           # 验证bypy并授权</span><br><span class="line">python -m bypy info</span><br></pre></td></tr></table></figure>
-<p>复制”Please Visit:”下的网址，登陆百度账号，并复制授权码。<br>授权成功后会看到授权网盘的总容量和已使用容量等信息。</p>
-<h2 id="bypy相关指令"><a href="#bypy相关指令" class="headerlink" title="bypy相关指令"></a>bypy相关指令</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">bypy.py upload                                              # 把当前目录同步到云盘</span><br><span class="line">bypy.py downdir                                             # 把云盘内容同步到本地来</span><br><span class="line">bypy.py syncdown                                            # 把云盘内容同步到本地来</span><br><span class="line">bypy.py compare                                             # 比较本地当前目录和云盘根目录</span><br></pre></td></tr></table></figure>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><ul>
-<li>百度网盘下bypy同步路径：/我的应用数据/bypy</li>
-</ul>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a target="_blank" rel="noopener" href="https://github.com/houtianze/bypy">bypy Github</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xiaowuyi/p/4160397.html">利用bypy实现树莓派NAS同步百度云</a></li>
-</ul>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ol>
+<li>Session管理<br>由SessionManager实现，通过配置文件实现Session持久化，配置文件格式为JSON，理论上支持无限层级分组支，支持手动修改，支持一键打开多个Session或按目录打开Session。          </li>
+<li>登录脚本<br>由SessionManager实现，支持在每次登录之后通过expect/send语法执行自定义命令，支持无限节点跳转。</li>
+<li>多窗口同时输入<br>由iTerm2原生能力实现，自定义快捷键触发，实现触发/取消多窗口同时输入。       </li>
+<li>自定义快捷键：支持Session复制，Tab切换，Tab重命名。<br>由iTerm2+macOS原生能力实现。</li>
+<li>高颜值<br>由iTerm2原生能力实现。</li>
+<li>快捷命令：支持快捷命令。<br>由iTerm2原生能力实现。</li>
+<li>记录文本的操作日志<br>由iTerm2原生能力实现。</li>
+<li>内嵌SFTP工具<br>待实现…      </li>
+</ol>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ol>
+<li>安装iTerm2</li>
+<li>下载SessionManager<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/yutianqi/SessionManager.git</span><br></pre></td></tr></table></figure></li>
+<li>安装iTerm2 Python支持库iterm2<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install iterm2</span><br></pre></td></tr></table></figure></li>
+<li>安装pexpect库<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pexpect</span><br></pre></td></tr></table></figure></li>
+<li>添加环境变量<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alias ssa=&quot;/home/ubuntu/code/SessionManager/ssmgr.py add&quot;</span><br><span class="line">alias ssd=&quot;/home/ubuntu/code/SessionManager/ssmgr.py delete -s&quot;</span><br><span class="line">alias ssl=&quot;/home/ubuntu/code/SessionManager/ssmgr.py list&quot;</span><br><span class="line">alias sso=&quot;/home/ubuntu/code/SessionManager/ssmgr.py open -s&quot;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><ol>
+<li>增加Session<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ssa              # </span><br><span class="line">ssa -j           # </span><br><span class="line">ssa -f           # </span><br></pre></td></tr></table></figure></li>
+<li>删除Session<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssd [nodeId]     # </span><br></pre></td></tr></table></figure></li>
+<li>查询Session<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ssl              # </span><br><span class="line">ssl -l           # </span><br><span class="line">ssl -l [nodeId]  # </span><br></pre></td></tr></table></figure></li>
+<li>打开Session<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sso [nodeId]     # </span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="其他APP比对"><a href="#其他APP比对" class="headerlink" title="其他APP比对"></a>其他APP比对</h2><table>
+<thead>
+<tr>
+<th>APP</th>
+<th>优点</th>
+<th>缺点</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SecureCRT</td>
+<td>总的来说上面几点都满足了，应该是和我的需求契合度最高的了，也是我目前的选择</td>
+<td>多窗口同时输入存在如下问题：1. 需要在单独的Command Windows进行，不支持上下查找历史命令，不支持tab联想，不支持类似Ctrl+C这种特殊命令，并且Command Windows会占用一部分额外的空间。2. 不稳定，这也是最让我无法接受的地方。Command Windows偶尔会无法输入，需要关掉再打开。在多窗口执行类似top命令后，偶现鼠标丢失，无法选择窗口文本。3. 设置例外窗口操作复杂。</td>
+<td></td>
+</tr>
+<tr>
+<td>Termius</td>
+<td></td>
+<td>Session只支持单一层级。</td>
+<td></td>
+</tr>
+<tr>
+<td>iTerm2</td>
+<td></td>
+<td>不支持Session管理。</td>
+<td></td>
+</tr>
+<tr>
+<td>Xshell7(CrossOver)</td>
+<td></td>
+<td>无法正常使用</td>
+<td>CrossOver官方没说支持，安装之后无法启动</td>
+</tr>
+<tr>
+<td>MobaXterm(CrossOver)</td>
+<td></td>
+<td>无法正常使用</td>
+<td>CrossOver官方说支持，安装过程卡在安装.net 4.6.2</td>
+</tr>
+<tr>
+<td>FinalShell</td>
+<td></td>
+<td>貌似已经停止维护了，而且网评资源占用很高</td>
+<td></td>
+</tr>
+<tr>
+<td>NuoShell</td>
+<td></td>
+<td>不支持多窗口同时输入。</td>
+<td></td>
+</tr>
+</tbody></table>
 
     </div>
 
@@ -271,10 +343,9 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/Python/" rel="tag"># Python</a>
-              <a href="/tags/RaspberryPi/" rel="tag"># RaspberryPi</a>
-              <a href="/tags/%E7%99%BE%E5%BA%A6%E7%BD%91%E7%9B%98/" rel="tag"># 百度网盘</a>
-              <a href="/tags/2018/" rel="tag"># 2018</a>
-              <a href="/tags/%E4%B8%89%E6%9C%88/" rel="tag"># 三月</a>
+              <a href="/tags/macOS/" rel="tag"># macOS</a>
+              <a href="/tags/2023/" rel="tag"># 2023</a>
+              <a href="/tags/%E5%9B%9B%E6%9C%88/" rel="tag"># 四月</a>
           </div>
 
         
@@ -283,12 +354,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2018/03/01/2018/02-28_Windows%E7%A6%BB%E7%BA%BF%E5%AE%89%E8%A3%85MySQL5-7-21/" rel="prev" title="Windows离线安装MySQL5.7.21">
-      <i class="fa fa-chevron-left"></i> Windows离线安装MySQL5.7.21
+    <a href="/2022/11/27/2022/11-27_macOS%E4%B8%8B%E7%9A%84PDF%E6%89%93%E5%8D%B0/" rel="prev" title="macOS下的PDF打印">
+      <i class="fa fa-chevron-left"></i> macOS下的PDF打印
     </a></div>
       <div class="post-nav-item">
-    <a href="/2018/10/29/2018/10-28_%E6%88%91%E7%9A%84%E5%88%A9%E5%99%A8/" rel="next" title="我的利器">
-      我的利器 <i class="fa fa-chevron-right"></i>
+    <a href="/2023/08/15/2023/08-15_%E4%B8%80%E4%B8%AAWindows%E7%94%A8%E6%88%B7%E4%BD%BF%E7%94%A8Mac%E7%9A%84%E4%B8%80%E4%BA%9B%E5%88%86%E4%BA%AB/" rel="next" title="Mac与PC：一个Windows用户使用Mac的一些分享">
+      Mac与PC：一个Windows用户使用Mac的一些分享 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -349,7 +420,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E6%8F%90%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">前提条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85bypy"><span class="nav-number">2.</span> <span class="nav-text">安装bypy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81bypy%E5%B9%B6%E6%8E%88%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">验证bypy并授权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bypy%E7%9B%B8%E5%85%B3%E6%8C%87%E4%BB%A4"><span class="nav-number">4.</span> <span class="nav-text">bypy相关指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">5.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%9A%84%E9%9C%80%E6%B1%82"><span class="nav-number">1.</span> <span class="nav-text">我的需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E5%9F%BA%E7%A1%80"><span class="nav-number">2.</span> <span class="nav-text">软件基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">4.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96APP%E6%AF%94%E5%AF%B9"><span class="nav-number">6.</span> <span class="nav-text">其他APP比对</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -500,7 +571,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'yutianqi.github.io',
       owner       : 'yutianqi',
       admin       : ['yutianqi'],
-      id          : 'b1f40305e502d8a96462756db87e70a6',
+      id          : 'c5058bf2b7c915c49fa43945fbdb4a92',
         language: 'zh-CN',
       distractionFreeMode: true
     });
