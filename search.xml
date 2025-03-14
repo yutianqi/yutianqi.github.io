@@ -621,7 +621,7 @@
   </entry>
   <entry>
     <title>IDEA远程Debug容器化部署服务</title>
-    <url>/2025/03/13/2025/IDEA%E8%BF%9C%E7%A8%8BDebug%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8A%A1/</url>
+    <url>/2025/03/13/2025/03-13_IDEA%E8%BF%9C%E7%A8%8BDebug%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8A%A1/</url>
     <content><![CDATA[<p>其实IDEA远程Debug k8s容器化部署的微服务，和远程Debug传统微服务本质上并没有差别。</p>
 <span id="more"></span>
 

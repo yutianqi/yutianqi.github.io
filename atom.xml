@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2025-03-14T03:01:16.366Z</updated>
+  <updated>2025-03-14T03:37:14.664Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -18,10 +18,10 @@
   
   <entry>
     <title>IDEA远程Debug容器化部署服务</title>
-    <link href="http://example.com/2025/03/13/2025/IDEA%E8%BF%9C%E7%A8%8BDebug%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8A%A1/"/>
-    <id>http://example.com/2025/03/13/2025/IDEA%E8%BF%9C%E7%A8%8BDebug%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8A%A1/</id>
-    <published>2025-03-13T09:42:17.000Z</published>
-    <updated>2025-03-14T03:01:16.366Z</updated>
+    <link href="http://example.com/2025/03/13/2025/03-13_IDEA%E8%BF%9C%E7%A8%8BDebug%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8A%A1/"/>
+    <id>http://example.com/2025/03/13/2025/03-13_IDEA%E8%BF%9C%E7%A8%8BDebug%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8A%A1/</id>
+    <published>2025-03-13T11:42:17.000Z</published>
+    <updated>2025-03-14T03:37:14.664Z</updated>
     
     <content type="html"><![CDATA[<p>其实IDEA远程Debug k8s容器化部署的微服务，和远程Debug传统微服务本质上并没有差别。</p><span id="more"></span><h2 id="为服务添加debug端口"><a href="#为服务添加debug端口" class="headerlink" title="为服务添加debug端口"></a>为服务添加debug端口</h2><p>对于传统服务，可在服务启动脚本中添加JVM参数，并重启微服务，实现添加debug端口的目的。而对于k8s容器化部署的服务，因为重启微服务会触发k8s自动重新部署镜像，修改后的启动脚本会被重新覆盖，所以原有方案并不可行。<br>解决的思路有两个，要么避免通过修改容器内的启动脚本中的JVM参数来实现添加debug端口，要么避免重启微服务时，k8s重新部署。<br>对于后者，可以通过修改探针配置来实现，本文主要采用前者，通过在yaml中指定服务启动命令，并添加debug参数来解决。<br>以deployment为例，具体方法如下：</p><ol><li>原有的deployment配置如下，启动参数是在Dockfile中通过ENTRYPOINT指定的，container配置中并无command配置：<br><img src="/images/debug1.png" alt="image.png"><br>DockerFile：<br><img src="/images/debug2.png" alt="image.png"></li><li>使用kubectl edit命令，在deployment的配置中通过command参数添加启动命令，包含debug端口配置。 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">kubectl edit deployment k8s-demo -n default</span><br><span class="line"><span class="meta">#</span><span class="bash"> debug端口配置</span></span><br><span class="line">-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=15008</span><br></pre></td></tr></table></figure> <img src="/images/debug3.png" alt="image.png"></li><li>保存deployment配置后，k8s将会自动重新部署微服务。</li><li>登录到微服务中，可以看到JVM启动参数已包含debug配置。<br> <img src="/images/debug4.png" alt="image.png"></li></ol><h2 id="将服务的debug端口暴露到外部"><a href="#将服务的debug端口暴露到外部" class="headerlink" title="将服务的debug端口暴露到外部"></a>将服务的debug端口暴露到外部</h2><p>当前debug端口是绑定到<code>微服务Pod的IP</code>上的，一般来说集群外部是无法直接访问该IP的，因此需要将该<code>IP:Port</code>映射到集群外部。具体方法如下：</p><ol><li>登录可从集群外部直接访问的节点，执行如下命令，将PodIP:Port映射到Node上。 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 将k8s-demo-6b495bcbc8-kr2zf这个Pod的debug端口15008映射到Node的15008端口上</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> port-forward命令默认会将端口绑定到127.0.0.1这个IP上，在Node之外仍是无法通过其他IP访问的</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 因此需要添加--address 0.0.0.0参数</span></span><br><span class="line">kubectl port-forward --address 0.0.0.0 k8s-demo-6b495bcbc8-kr2zf 15008:15008</span><br></pre></td></tr></table></figure> <img src="/images/debug5.png" alt="image.png"></li><li>在本地执行curl命令，如下显示即为监听正常。<br> <img src="/images/debug6.png" alt="image.png"></li></ol><h2 id="在IDEA中添加debug配置"><a href="#在IDEA中添加debug配置" class="headerlink" title="在IDEA中添加debug配置"></a>在IDEA中添加debug配置</h2><p>该操作和远程Debug传统微服务完全一样。具体方法如下：</p><ol><li>打开IDEA debug配置界面，添加Remote JVM Debug配置，IP为步骤2中执行port-forward命令的Node的IP，Port为命令中指定的Port。<br> <img src="/images/debug7.png" alt="image.png"></li><li>在IDEA中对代码添加断点，并执行对应业务，即可触发断点拦截。</li></ol><h2 id="备注"><a href="#备注" class="headerlink" title="备注"></a>备注</h2><p>在调试单点疑难问题的时候，远程debug还是很有效的，但是对于普通的业务问题，打印高质量的日志才是最佳实践。</p>]]></content>
     
